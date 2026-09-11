@@ -1,0 +1,221 @@
+-- Sunset Speed GUI
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "SunsetSpeed"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = player.PlayerGui
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 170, 0, 75)
+MainFrame.Position = UDim2.new(1, -185, 0.5, -37)
+MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+local Corner = Instance.new("UICorner")
+Corner.CornerRadius = UDim.new(0, 10)
+Corner.Parent = MainFrame
+
+local Stroke = Instance.new("UIStroke")
+Stroke.Color = Color3.fromRGB(255, 200, 100)
+Stroke.Thickness = 2
+Stroke.Parent = MainFrame
+
+local BgImage = Instance.new("ImageLabel")
+BgImage.Size = UDim2.new(1, 0, 1, 0)
+BgImage.BackgroundTransparency = 1
+BgImage.Image = "rbxassetid://135730318591850"
+BgImage.ScaleType = Enum.ScaleType.Crop
+BgImage.Parent = MainFrame
+
+local Logo = Instance.new("ImageLabel")
+Logo.Size = UDim2.new(0, 22, 0, 22)
+Logo.Position = UDim2.new(0, 6, 0, 4)
+Logo.BackgroundTransparency = 1
+Logo.Image = "rbxassetid://135730318591850"
+Logo.ScaleType = Enum.ScaleType.Fit
+Logo.Parent = MainFrame
+
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Size = UDim2.new(1, -34, 0, 22)
+TitleLabel.Position = UDim2.new(0, 30, 0, 4)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text = "SUNSET SPEED"
+TitleLabel.TextColor3 = Color3.fromRGB(255, 200, 100)
+TitleLabel.TextSize = 13
+TitleLabel.Font = Enum.Font.GothamBold
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+TitleLabel.Parent = MainFrame
+
+local SpeedBox = Instance.new("TextBox")
+SpeedBox.Size = UDim2.new(0, 60, 0, 26)
+SpeedBox.Position = UDim2.new(0, 8, 0.5, -8)
+SpeedBox.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+SpeedBox.BorderSizePixel = 0
+SpeedBox.Text = "16"
+SpeedBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpeedBox.TextSize = 12
+SpeedBox.Font = Enum.Font.Gotham
+SpeedBox.ClearTextOnFocus = false
+SpeedBox.Parent = MainFrame
+
+local BoxCorner = Instance.new("UICorner")
+BoxCorner.CornerRadius = UDim.new(0, 5)
+BoxCorner.Parent = SpeedBox
+
+local BoxStroke = Instance.new("UIStroke")
+BoxStroke.Color = Color3.fromRGB(255, 200, 100)
+BoxStroke.Thickness = 1
+BoxStroke.Parent = SpeedBox
+
+SpeedBox:GetPropertyChangedSignal("Text"):Connect(function()
+    local filtered = SpeedBox.Text:gsub("%D", "")
+    if SpeedBox.Text ~= filtered then
+        SpeedBox.Text = filtered
+    end
+end)
+
+-- Toggle Switch
+local ToggleTrack = Instance.new("Frame")
+ToggleTrack.Size = UDim2.new(0, 44, 0, 22)
+ToggleTrack.Position = UDim2.new(1, -52, 0.5, -8)
+ToggleTrack.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+ToggleTrack.BorderSizePixel = 0
+ToggleTrack.Parent = MainFrame
+
+local ToggleCorner = Instance.new("UICorner")
+ToggleCorner.CornerRadius = UDim.new(1, 0)
+ToggleCorner.Parent = ToggleTrack
+
+local ToggleStroke = Instance.new("UIStroke")
+ToggleStroke.Color = Color3.fromRGB(80, 80, 80)
+ToggleStroke.Thickness = 1
+ToggleStroke.Parent = ToggleTrack
+
+local ToggleKnob = Instance.new("Frame")
+ToggleKnob.Size = UDim2.new(0, 16, 0, 16)
+ToggleKnob.Position = UDim2.new(0, 3, 0.5, -8)
+ToggleKnob.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+ToggleKnob.BorderSizePixel = 0
+ToggleKnob.Parent = ToggleTrack
+
+local KnobCorner = Instance.new("UICorner")
+KnobCorner.CornerRadius = UDim.new(1, 0)
+KnobCorner.Parent = ToggleKnob
+
+local ToggleClick = Instance.new("TextButton")
+ToggleClick.Size = UDim2.new(1, 0, 1, 0)
+ToggleClick.Position = UDim2.new(0, 0, 0, 0)
+ToggleClick.BackgroundTransparency = 1
+ToggleClick.Text = ""
+ToggleClick.Parent = ToggleTrack
+
+local speedEnabled = false
+local targetSpeed = 16
+local connection = nil
+local lastPosition = nil
+local lastTime = nil
+
+local function getCharParts()
+    local char = player.Character
+    if not char then return nil, nil end
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not hum or not root then return nil, nil end
+    return hum, root
+end
+
+local function claimOwnership(root)
+    pcall(function() root:SetNetworkOwner(player) end)
+end
+
+local function applySpeed(spd)
+    if connection then connection:Disconnect() connection = nil end
+    local hum, root = getCharParts()
+    if not hum or not root then return end
+    hum.WalkSpeed = spd
+    claimOwnership(root)
+    lastPosition = root.Position
+    lastTime = tick()
+    local ownershipTimer = 0
+    local lagbackCooldown = 0
+    connection = RunService.Heartbeat:Connect(function(dt)
+        if not speedEnabled then return end
+        local hum, root = getCharParts()
+        if not hum or not root then return end
+        ownershipTimer += dt
+        if ownershipTimer >= 1.5 then
+            claimOwnership(root)
+            ownershipTimer = 0
+        end
+        local dir = hum.MoveDirection
+        if dir.Magnitude < 0.1 then
+            lastPosition = root.Position
+            lastTime = tick()
+            return
+        end
+        local currentVel = root.AssemblyLinearVelocity
+        local targetVel = Vector3.new(dir.X * spd, currentVel.Y, dir.Z * spd)
+        local alpha = math.min(dt * 22, 1)
+        root.AssemblyLinearVelocity = currentVel:Lerp(targetVel, alpha)
+        lagbackCooldown -= dt
+        local now = tick()
+        local elapsed = now - lastTime
+        if elapsed > 0.1 and lastPosition then
+            local expectedDist = spd * elapsed
+            local actualDist = (root.Position - lastPosition).Magnitude
+            if actualDist < expectedDist * 0.3 and lagbackCooldown <= 0 then
+                root.AssemblyLinearVelocity = targetVel * 1.2
+                lagbackCooldown = 0.3
+            end
+        end
+        lastPosition = root.Position
+        lastTime = now
+    end)
+end
+
+local function updateToggle()
+    if speedEnabled then
+        ToggleTrack.BackgroundColor3 = Color3.fromRGB(255, 200, 100)
+        ToggleKnob.Position = UDim2.new(1, -19, 0.5, -8)
+        ToggleKnob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        ToggleStroke.Color = Color3.fromRGB(255, 200, 100)
+    else
+        ToggleTrack.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        ToggleKnob.Position = UDim2.new(0, 3, 0.5, -8)
+        ToggleKnob.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+        ToggleStroke.Color = Color3.fromRGB(80, 80, 80)
+    end
+end
+
+ToggleClick.MouseButton1Click:Connect(function()
+    local inputVal = tonumber(SpeedBox.Text)
+    if not inputVal then
+        SpeedBox.Text = "16"
+        inputVal = 16
+    end
+    speedEnabled = not speedEnabled
+    targetSpeed = inputVal
+    updateToggle()
+    if speedEnabled then
+        applySpeed(targetSpeed)
+    else
+        if connection then connection:Disconnect() connection = nil end
+        local hum, _ = getCharParts()
+        if hum then hum.WalkSpeed = 16 end
+        lastPosition = nil
+        lastTime = nil
+    end
+end)
+
+player.CharacterAdded:Connect(function(char)
+    if speedEnabled then
+        task.wait(0.1)
+        applySpeed(targetSpeed)
+    end
+end)

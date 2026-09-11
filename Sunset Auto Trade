@@ -1,0 +1,166 @@
+print("Sunset Auto Trade loaded - 24/7")
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local autoAcceptEnabled = false
+local autoReadyConnection = nil
+local containerConnection = nil
+
+local function clickYes(prompt)
+    local yesButton = prompt:FindFirstChild("Yes", true)
+    if yesButton then
+        if firesignal then
+            firesignal(yesButton.Activated)
+        else
+            local VirtualInputManager = game:GetService("VirtualInputManager")
+            local pos = yesButton.AbsolutePosition + (yesButton.AbsoluteSize / 2)
+            VirtualInputManager:SendMouseButtonEvent(pos.X, pos.Y, 0, true, game, 1)
+            task.wait(0.05)
+            VirtualInputManager:SendMouseButtonEvent(pos.X, pos.Y, 0, false, game, 1)
+        end
+    end
+end
+
+local function AcceptReady()
+    local tradeGui = player.PlayerGui:FindFirstChild("TradeLiveTrade")
+    if tradeGui then
+        local readyButton = tradeGui:FindFirstChild("ReadyButton", true) or tradeGui:FindFirstChild("Other", true):FindFirstChild("ReadyButton")
+        if readyButton and firesignal then
+            firesignal(readyButton.Activated)
+        end
+    end
+end
+
+local function createLabel()
+    local function addLabel(char)
+        if not char then return end
+        local head = char:FindFirstChild("Head")
+        if not head then return end
+        
+        local oldLabel = head:FindFirstChild("SunsetAutoTrade")
+        if oldLabel then oldLabel:Destroy() end
+        
+        local billboard = Instance.new("BillboardGui")
+        billboard.Name = "SunsetAutoTrade"
+        billboard.Size = UDim2.new(0, 250, 0, 30)
+        billboard.Adornee = head
+        billboard.StudsOffset = Vector3.new(0, 3, 0)
+        billboard.AlwaysOnTop = true
+        billboard.Parent = head
+        
+        local label = Instance.new("TextLabel", billboard)
+        label.Size = UDim2.new(1, 0, 1, 0)
+        label.BackgroundTransparency = 1
+        label.Text = "Sunset Auto Trade"
+        label.Font = Enum.Font.GothamBold
+        label.TextScaled = true
+        label.TextColor3 = Color3.fromRGB(255, 200, 100)
+        label.TextStrokeTransparency = 0.2
+        label.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+    end
+    
+    if player.Character then addLabel(player.Character) end
+    player.CharacterAdded:Connect(function(char)
+        task.wait(0.5)
+        addLabel(char)
+    end)
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "SunsetAutoTrade"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = player:WaitForChild("PlayerGui")
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 200, 0, 80)
+MainFrame.Position = UDim2.new(0.5, -100, 0.35, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+MainFrame.BackgroundTransparency = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner", MainFrame)
+UICorner.CornerRadius = UDim.new(0, 10)
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 25)
+Title.Position = UDim2.new(0, 0, 0, 2)
+Title.BackgroundTransparency = 1
+Title.Text = "Sunset Auto Trade"
+Title.TextColor3 = Color3.fromRGB(255, 200, 100)
+Title.TextScaled = true
+Title.Font = Enum.Font.GothamBold
+Title.Parent = MainFrame
+
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Size = UDim2.new(0.7, 0, 0, 30)
+ToggleButton.Position = UDim2.new(0.15, 0, 0.5, 0)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+ToggleButton.Text = "OFF"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.TextScaled = true
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.Parent = MainFrame
+
+local ToggleCorner = Instance.new("UICorner", ToggleButton)
+ToggleCorner.CornerRadius = UDim.new(0, 6)
+
+local function updateUI()
+    if autoAcceptEnabled then
+        ToggleButton.BackgroundColor3 = Color3.fromRGB(255, 200, 100)
+        ToggleButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+        ToggleButton.Text = "ON"
+    else
+        ToggleButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        ToggleButton.Text = "OFF"
+    end
+end
+
+ToggleButton.MouseButton1Click:Connect(function()
+    autoAcceptEnabled = not autoAcceptEnabled
+    updateUI()
+    
+    if autoAcceptEnabled then
+        if not autoReadyConnection then
+            autoReadyConnection = task.spawn(function()
+                while autoAcceptEnabled do
+                    AcceptReady()
+                    task.wait(0.35)
+                end
+            end)
+        end
+        
+        if not containerConnection then
+            local success, container = pcall(function()
+                return player.PlayerGui:WaitForChild("DuelsMachinePrompt", 5):WaitForChild("DuelsMachinePrompt", 5)
+            end)
+            if success and container then
+                containerConnection = container.ChildAdded:Connect(function(child)
+                    if child.Name == "Prompt" then
+                        task.wait(0.25)
+                        local label = child:FindFirstChild("Label", true)
+                        if label and label.Text == "Trade Request" then
+                            clickYes(child)
+                        end
+                    end
+                end)
+            end
+        end
+    else
+        if autoReadyConnection then
+            task.cancel(autoReadyConnection)
+            autoReadyConnection = nil
+        end
+        if containerConnection then
+            containerConnection:Disconnect()
+            containerConnection = nil
+        end
+    end
+end)
+
+updateUI()
+task.wait(1)
+createLabel()
+warn("Sunset Auto Trade loaded - Click OFF to activate")

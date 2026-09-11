@@ -1,0 +1,263 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+local spoofAmount = nil
+local currentExistLabel = nil
+local originalText = nil
+local monitorConn = nil
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "SunsetSpoofer"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
+
+local Main = Instance.new("Frame")
+Main.Size = UDim2.new(0, 160, 0, 110)
+Main.Position = UDim2.new(1, -175, 0.5, -55)
+Main.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Main.BorderSizePixel = 0
+Main.Active = true
+Main.Draggable = true
+Main.ClipsDescendants = true
+Main.Parent = ScreenGui
+
+local Corner = Instance.new("UICorner")
+Corner.CornerRadius = UDim.new(0, 12)
+Corner.Parent = Main
+
+local BgImage = Instance.new("ImageLabel")
+BgImage.Size = UDim2.new(1, 0, 1, 0)
+BgImage.BackgroundTransparency = 0
+BgImage.Image = "rbxassetid://135730318591850"
+BgImage.ScaleType = Enum.ScaleType.Crop
+BgImage.Parent = Main
+
+local BgCorner = Instance.new("UICorner")
+BgCorner.CornerRadius = UDim.new(0, 12)
+BgCorner.Parent = BgImage
+
+local Logo = Instance.new("ImageLabel")
+Logo.Size = UDim2.new(0, 20, 0, 20)
+Logo.Position = UDim2.new(0, 6, 0, 4)
+Logo.BackgroundTransparency = 1
+Logo.Image = "rbxassetid://135730318591850"
+Logo.ScaleType = Enum.ScaleType.Fit
+Logo.Parent = Main
+
+local LogoCorner = Instance.new("UICorner")
+LogoCorner.CornerRadius = UDim.new(0, 4)
+LogoCorner.Parent = Logo
+
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 20, 0, 20)
+CloseBtn.Position = UDim2.new(1, -24, 0, 4)
+CloseBtn.BackgroundTransparency = 0.2
+CloseBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+CloseBtn.Text = "✕"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseBtn.TextSize = 12
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.Parent = Main
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 4)
+CloseCorner.Parent = CloseBtn
+
+CloseBtn.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, -50, 0, 20)
+Title.Position = UDim2.new(0, 28, 0, 4)
+Title.BackgroundTransparency = 1
+Title.Text = "SUNSET SPOOFER"
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 11
+Title.TextColor3 = Color3.fromRGB(0, 150, 255)
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = Main
+
+local TextBox = Instance.new("TextBox")
+TextBox.Size = UDim2.new(1, -16, 0, 24)
+TextBox.Position = UDim2.new(0, 8, 0, 30)
+TextBox.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+TextBox.BackgroundTransparency = 0.5
+TextBox.BorderSizePixel = 0
+TextBox.Text = ""
+TextBox.PlaceholderText = "Enter count"
+TextBox.Font = Enum.Font.Gotham
+TextBox.TextSize = 11
+TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextBox.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
+TextBox.ClearTextOnFocus = false
+TextBox.Parent = Main
+
+local TbCorner = Instance.new("UICorner")
+TbCorner.CornerRadius = UDim.new(0, 5)
+TbCorner.Parent = TextBox
+
+local TbStroke = Instance.new("UIStroke")
+TbStroke.Color = Color3.fromRGB(0, 150, 255)
+TbStroke.Thickness = 1
+TbStroke.Transparency = 0.5
+TbStroke.Parent = TextBox
+
+local ApplyBtn = Instance.new("TextButton")
+ApplyBtn.Size = UDim2.new(0.45, -4, 0, 22)
+ApplyBtn.Position = UDim2.new(0, 8, 0, 60)
+ApplyBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+ApplyBtn.BackgroundTransparency = 0.5
+ApplyBtn.BorderSizePixel = 0
+ApplyBtn.Text = "APPLY"
+ApplyBtn.Font = Enum.Font.GothamBold
+ApplyBtn.TextSize = 10
+ApplyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ApplyBtn.Parent = Main
+
+local ApplyCorner = Instance.new("UICorner")
+ApplyCorner.CornerRadius = UDim.new(0, 5)
+ApplyCorner.Parent = ApplyBtn
+
+local ResetBtn = Instance.new("TextButton")
+ResetBtn.Size = UDim2.new(0.45, -4, 0, 22)
+ResetBtn.Position = UDim2.new(0.52, 4, 0, 60)
+ResetBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+ResetBtn.BackgroundTransparency = 0.5
+ResetBtn.BorderSizePixel = 0
+ResetBtn.Text = "RESET"
+ResetBtn.Font = Enum.Font.GothamBold
+ResetBtn.TextSize = 10
+ResetBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ResetBtn.Parent = Main
+
+local ResetCorner = Instance.new("UICorner")
+ResetCorner.CornerRadius = UDim.new(0, 5)
+ResetCorner.Parent = ResetBtn
+
+local Status = Instance.new("TextLabel")
+Status.Size = UDim2.new(1, -16, 0, 20)
+Status.Position = UDim2.new(0, 8, 0, 86)
+Status.BackgroundTransparency = 1
+Status.Text = "Ready"
+Status.Font = Enum.Font.Gotham
+Status.TextSize = 9
+Status.TextColor3 = Color3.fromRGB(150, 150, 150)
+Status.Parent = Main
+
+local suffixes = {"", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"}
+
+local function formatNumber(n)
+    if n < 1000 then return tostring(n) end
+    if n < 1000000 then
+        local formatted = tostring(math.floor(n))
+        local k
+        while true do
+            formatted, k = formatted:gsub("^(-?%d+)(%d%d%d)", "%1,%2")
+            if k == 0 then break end
+        end
+        return formatted
+    end
+    local idx = 1
+    local val = n
+    while val >= 1000 and idx < #suffixes do
+        val = val / 1000
+        idx = idx + 1
+    end
+    return string.format("%.1f%s", val, suffixes[idx])
+end
+
+local function findExistLabel()
+    local function search(root)
+        for _, obj in ipairs(root:GetDescendants()) do
+            if obj:IsA("TextLabel") and obj.Name == "Exists" and obj.Visible then
+                local text = obj.Text
+                if text and text:find("Exist") then
+                    return obj
+                end
+            end
+        end
+        return nil
+    end
+    return search(workspace) or search(PlayerGui)
+end
+
+local function applySpoof()
+    if not currentExistLabel or not currentExistLabel.Parent then
+        currentExistLabel = findExistLabel()
+    end
+    if currentExistLabel and spoofAmount then
+        currentExistLabel.Text = formatNumber(spoofAmount) .. " Exist"
+    end
+end
+
+local function startMonitor()
+    if monitorConn then monitorConn:Disconnect() end
+    monitorConn = RunService.Heartbeat:Connect(function()
+        if not spoofAmount then return end
+        if not currentExistLabel or not currentExistLabel.Parent then
+            currentExistLabel = findExistLabel()
+        end
+        if currentExistLabel then
+            local target = formatNumber(spoofAmount) .. " Exist"
+            if currentExistLabel.Text ~= target then
+                currentExistLabel.Text = target
+            end
+        end
+    end)
+end
+
+ApplyBtn.MouseButton1Click:Connect(function()
+    local input = TextBox.Text:gsub(",", ""):gsub("%s", "")
+    local num = tonumber(input)
+    if not num then
+        Status.Text = "Invalid!"
+        Status.TextColor3 = Color3.fromRGB(255, 80, 80)
+        return
+    end
+    spoofAmount = math.floor(num)
+    currentExistLabel = findExistLabel()
+    if not currentExistLabel then
+        Status.Text = "Open glossary first"
+        Status.TextColor3 = Color3.fromRGB(255, 180, 80)
+        return
+    end
+    if not originalText then originalText = currentExistLabel.Text end
+    applySpoof()
+    startMonitor()
+    Status.Text = formatNumber(spoofAmount)
+    Status.TextColor3 = Color3.fromRGB(0, 150, 255)
+end)
+
+ResetBtn.MouseButton1Click:Connect(function()
+    spoofAmount = nil
+    if monitorConn then monitorConn:Disconnect() monitorConn = nil end
+    if currentExistLabel and originalText then
+        currentExistLabel.Text = originalText
+    end
+    originalText = nil
+    currentExistLabel = nil
+    Status.Text = "Reset"
+    Status.TextColor3 = Color3.fromRGB(150, 150, 150)
+end)
+
+task.spawn(function()
+    local glossary = PlayerGui:WaitForChild("Glossary", 30)
+    if glossary then
+        glossary:GetPropertyChangedSignal("Enabled"):Connect(function()
+            if not glossary.Enabled then
+                originalText = nil
+                currentExistLabel = nil
+                Status.Text = "Closed"
+                Status.TextColor3 = Color3.fromRGB(150, 150, 150)
+            else
+                Status.Text = "Select animal"
+                Status.TextColor3 = Color3.fromRGB(0, 150, 255)
+            end
+        end)
+        Status.Text = "Open Glossary"
+        Status.TextColor3 = Color3.fromRGB(0, 150, 255)
+    end
+end)
