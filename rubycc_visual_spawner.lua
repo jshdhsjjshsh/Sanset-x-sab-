@@ -78,13 +78,13 @@ end
 
 -- ── THEME ────────────────────────────────────────────────
 local BG      = Color3.fromRGB(7,7,9)
-local SURFACE = Color3.fromRGB(14,12,15)
-local ACCENT  = Color3.fromRGB(225,18,48)
-local BORDER  = Color3.fromRGB(105,16,34)
+local SURFACE = Color3.fromRGB(10,0,18)
+local ACCENT  = Color3.fromRGB(170,0,255)
+local BORDER  = Color3.fromRGB(120,0,200)
 local TEXT    = Color3.fromRGB(248,244,246)
 local SUBTEXT = Color3.fromRGB(170,92,108)
-local ITEMHOV = Color3.fromRGB(24,15,18)
-local ITEMSEL = Color3.fromRGB(78,16,31)
+local ITEMHOV = Color3.fromRGB(40,10,60)
+local ITEMSEL = Color3.fromRGB(100,0,180)
 local BTNRED  = Color3.fromRGB(205,24,48)
 local BTNGRN  = Color3.fromRGB(38,178,92)
 
@@ -115,7 +115,7 @@ local MUTATION_PALETTES = {
     Candy       = {Color3.fromRGB(255,105,180), Color3.fromRGB(255,182,193),Color3.fromRGB(200,50,150),Color3.fromRGB(255,20,147), Color3.fromRGB(255,200,220),Color3.fromRGB(255,240,245)},
     Lava        = {Color3.fromRGB(200,50,0),    Color3.fromRGB(255,100,0),  Color3.fromRGB(150,20,0),  Color3.fromRGB(100,10,0),   Color3.fromRGB(255,160,0),  Color3.fromRGB(255,220,100)},
     Galaxy      = {Color3.fromRGB(60,0,120),    Color3.fromRGB(100,0,180),  Color3.fromRGB(30,0,80),   Color3.fromRGB(180,0,255),  Color3.fromRGB(80,0,160),   Color3.fromRGB(200,150,255)},
-    YinYang     = {BG, Color3.fromRGB(20,20,28),Color3.fromRGB(230,230,240),     Color3.fromRGB(230,230,240),   Color3.fromRGB(128,128,128),Color3.fromRGB(14,12,15)},
+    YinYang     = {BG, Color3.fromRGB(20,20,28),Color3.fromRGB(245,225,255),     Color3.fromRGB(245,225,255),   Color3.fromRGB(128,128,128),Color3.fromRGB(10,0,18)},
     Radioactive = {Color3.fromRGB(100,255,0),   Color3.fromRGB(150,255,50), Color3.fromRGB(50,200,0),  Color3.fromRGB(0,150,0),    Color3.fromRGB(200,255,100),Color3.fromRGB(230,255,180)},
     Cursed      = {Color3.fromRGB(255,23,23),   Color3.fromRGB(180,0,0),    Color3.fromRGB(120,0,0),   Color3.fromRGB(80,0,0),     Color3.fromRGB(255,100,100),Color3.fromRGB(255,180,180)},
     Divine      = {Color3.fromRGB(255,215,0),   Color3.fromRGB(255,255,200),Color3.fromRGB(200,160,0), Color3.fromRGB(255,240,150),BG,Color3.fromRGB(255,250,220)},
@@ -137,53 +137,107 @@ local MUTATION_STUDS = {
 }
 
 -- ── DATA ─────────────────────────────────────────────────
-local ANIMALS_BY_RARITY = {
-    {rarity="OG",     names={"Skibidi Toilet","Strawberry Elephant","Headless Horseman","Meowl","John Pork"}},
-    {rarity="Secret", names={"Dragon Cannelloni","Garama and Madundung","Elefanto Frigo","Signore Carapace","Fragola La La La","Love Love Bear","Hydra Dragon Cannelloni","Tang Tang Keletang","Ketchuru and Musturu","Burguro And Fryuro","La Secret Combinasion","Tictac Sahur","Cerberus","Capitano Moby","Foxini Lanternini","Antonio","Ginger Gerat","Fishino Clownino","Guerriro Digitale","Ginger Globo","Cappuccino Clownino","Griffin","La Supreme Combinasion","Arcadragon","Rosey and Teddy","Hydra Bunny","Ketupat Bros","Tirilikalika Tirilikalako","Pancake and Syrup","Cash or Card","Dragon Gingerini","Globa Steppa","Gym Bros","Money Money Bros","Dug dug dug","Digi Narwhal","Popcuru and Fizzuru","Reinito Sleighito","Los Amigos","Los Sekolahs","Los Spaghettis","Spaghetti Tualetti","Spooky and Pumpky","Ventoliero Pavonero","Quackini Snackini","Sammyni Fattini","Nacho Spyder","Rosetti Tualetti","Lavadorito Spinito","Las Sis","La Casa Boo","Fragrama and Chocrama","Cooki and Milki","Bunny and Eggy","Celestial Pegasus","Chillin Chili","Chipso and Queso","Cloverat Clapat"}},
-}
-local MUTATIONS = {"None","Gold","Diamond","Bloodrot","Rainbow","Candy","Lava","Galaxy","YinYang","Radioactive","Cursed","Divine","Cyber","Crystal"}
+local ANIMALS_BY_RARITY = (function()
+    local data = {}
+    pcall(function()
+        data = require(game:GetService("ReplicatedStorage").Datas.Animals)
+    end)
 
-local TRAITS = {
-    "Taco","Nyan","Galactic","Fireworks","Zombie","Claws","Glitched","Bubblegum",
-    "Fire","Wet","Snowy","Cometstruck","Explosive","Disco","10B","Shark Fin",
-    "Matteo Hat","Brazil","Sleepy","Lightning","UFO","Spider","Strawberry","Paint",
-    "Skeleton","Sombrero","Tie","Witch Hat","Indonesia","Meowl","John Pork","RIP Gravestone",
-    "Jackolantern Pet","Santa Hat","Reindeer Pet","Skibidi","26","Rose",":3",
-    "Chocolate","Halo","Lucky","Orange Balloon","Green Balloon","Blue Balloon",
-    "Red Balloon","Pink Balloon","Rainbow Balloon","Granny","Bunny Ears",
-    "Orange Egg","Green Egg","Blue Egg","Pink Egg",
-}
+    local byRarity = {}
+    local RARITY_ORDER = {
+        "OG", "Secret", "Brainrot God", "Legendary", "Epic", "Rare", "Common",
+        "Mythic", "Admin", "Taco", "Spooky", "Festive", "Valentines",
+        "St Patrick's", "Easter", "Summer", "Honey",
+    }
 
-local TRAIT_ICONS = {
-    ["Taco"]="rbxassetid://89041930759464",["Nyan"]="rbxassetid://104229924295526",
-    ["Galactic"]="rbxassetid://99181785766598",["Fireworks"]="rbxassetid://121100427764858",
-    ["Zombie"]="rbxassetid://110723387483939",["Claws"]="rbxassetid://104964195846833",
-    ["Glitched"]="rbxassetid://121332433272976",["Bubblegum"]="rbxassetid://100601425541874",
-    ["Fire"]="rbxassetid://118283346037788",["Wet"]="rbxassetid://78474194088770",
-    ["Snowy"]="rbxassetid://83627475909869",["Cometstruck"]="rbxassetid://127455440418221",
-    ["Explosive"]="rbxassetid://97725744252608",["Disco"]="rbxassetid://82620342632406",
-    ["10B"]="rbxassetid://134655415681926",["Shark Fin"]="rbxassetid://104985313532149",
-    ["Matteo Hat"]="rbxassetid://115664804212096",["Brazil"]="rbxassetid://75650816341229",
-    ["Sleepy"]="rbxassetid://115001117876534",["Lightning"]="rbxassetid://139729696247144",
-    ["UFO"]="rbxassetid://110910518481052",["Spider"]="rbxassetid://117478971325696",
-    ["Strawberry"]="rbxassetid://84731118566493",["Paint"]="rbxassetid://119591742504251",
-    ["Skeleton"]="rbxassetid://89591838221335",["Sombrero"]="rbxassetid://95128039793845",
-    ["Tie"]="rbxassetid://103610037004911",["Witch Hat"]="rbxassetid://123964048606874",
-    ["Indonesia"]="rbxassetid://93350414974589",["Meowl"]="rbxassetid://114748221761549",
-    ["John Pork"]="rbxassetid://117176397136731",
-    ["RIP Gravestone"]="rbxassetid://123115843719383",["Jackolantern Pet"]="rbxassetid://97054765273857",
-    ["Santa Hat"]="rbxassetid://88375043733582",["Reindeer Pet"]="rbxassetid://70894779883038",
-    ["Skibidi"]="rbxassetid://83384385019272",["26"]="rbxassetid://80468035315420",
-    ["Rose"]="rbxassetid://135489065859287",[":3"]="rbxassetid://108293878529172",
-    ["Chocolate"]="rbxassetid://81641382604997",["Halo"]="rbxassetid://98316436141359",
-    ["Lucky"]="rbxassetid://124098467754457",["Orange Balloon"]="rbxassetid://83111173051279",
-    ["Green Balloon"]="rbxassetid://75222826429094",["Blue Balloon"]="rbxassetid://128841931686463",
-    ["Red Balloon"]="rbxassetid://119661964026012",["Pink Balloon"]="rbxassetid://114128099162490",
-    ["Rainbow Balloon"]="rbxassetid://112821854659961",["Granny"]="rbxassetid://73467619616299",
-    ["Bunny Ears"]="rbxassetid://118516289496954",["Orange Egg"]="rbxassetid://76307362192037",
-    ["Green Egg"]="rbxassetid://94602857440295",["Blue Egg"]="rbxassetid://109212886335786",
-    ["Pink Egg"]="rbxassetid://133939661230277",
-}
+    for name, info in pairs(data) do
+        if type(info) == "table" and not info.LuckyBlock then
+            local rarity = info.Rarity or "Common"
+            if not byRarity[rarity] then
+                byRarity[rarity] = {}
+            end
+            table.insert(byRarity[rarity], name)
+        end
+    end
+
+    for rarity, list in pairs(byRarity) do
+        table.sort(list, function(a, b)
+            local ga = (data[a] and tonumber(data[a].Generation)) or 0
+            local gb = (data[b] and tonumber(data[b].Generation)) or 0
+            if ga ~= gb then return ga > gb end
+            return a < b
+        end)
+    end
+
+    local result = {}
+    for _, rarity in ipairs(RARITY_ORDER) do
+        if byRarity[rarity] and #byRarity[rarity] > 0 then
+            table.insert(result, {rarity = rarity, names = byRarity[rarity]})
+        end
+    end
+    for rarity, list in pairs(byRarity) do
+        local found = false
+        for _, entry in ipairs(result) do
+            if entry.rarity == rarity then found = true break end
+        end
+        if not found then
+            table.insert(result, {rarity = rarity, names = list})
+        end
+    end
+    return result
+end)()
+local MUTATIONS = (function()
+    local out = {"None"}
+    local seen = {None = true}
+    local ok, data = pcall(function() return require(RS.Datas.Mutations) end)
+    if ok and type(data) == "table" then
+        for name in pairs(data) do
+            if type(name) == "string" and not seen[name] then
+                seen[name] = true
+                table.insert(out, name)
+            end
+        end
+    end
+    table.sort(out, function(a, b)
+        if a == "None" then return true end
+        if b == "None" then return false end
+        return a < b
+    end)
+    return out
+end)()
+
+local TRAITS = (function()
+    local out = {}
+    local seen = {}
+    local ok, data = pcall(function() return require(RS.Datas.Traits) end)
+    if ok and type(data) == "table" then
+        for name, info in pairs(data) do
+            if type(name) == "string" and not seen[name] then
+                seen[name] = true
+                table.insert(out, name)
+            end
+        end
+    end
+    table.sort(out)
+    return out
+end)()
+
+local TRAIT_ICONS = setmetatable({}, {
+    __index = function(_, name)
+        local ok, data = pcall(function() return require(RS.Datas.Traits) end)
+        if not ok or type(data) ~= "table" then return nil end
+        local info = data[name]
+        if not info then return nil end
+        local icon = info.Icon or info.Image or info.Texture
+        if type(icon) == "number" then return "rbxassetid://"..tostring(icon) end
+        if type(icon) == "string" then
+            if icon:match("^rbxassetid://") then return icon end
+            if icon:match("^%d+$") then return "rbxassetid://"..icon end
+            return icon
+        end
+        return nil
+    end,
+})
 
 local LIVE_MUTATION_DATA = {}
 local LIVE_TRAIT_DATA = {}
@@ -219,13 +273,6 @@ end
 
 _appendMissingDataNames(MUTATIONS, LIVE_MUTATION_DATA)
 _appendMissingDataNames(TRAITS, LIVE_TRAIT_DATA)
-for name, data in pairs(LIVE_TRAIT_DATA) do
-    if type(data) == "table" then
-        local icon = _iconAsset(data.Icon or data.Image or data.Texture)
-        if icon then TRAIT_ICONS[name] = icon end
-    end
-end
-
 -- ── HELPERS ──────────────────────────────────────────────
 -- "John Pork" trait reskins any brainrot wearing it to mimic the real game's
 -- "John Pork is Calling..." event — the overhead nametag gets a suffix.
@@ -294,27 +341,60 @@ end
 local function Corner(p,r)
     local c=Instance.new("UICorner"); c.CornerRadius=UDim.new(0,r or 6); c.Parent=p; return c
 end
-local function MakeDraggable(frame,handle)
-    handle=handle or frame
-    local drag,ds,sp
-    handle.InputBegan:Connect(function(i)
-        if i.UserInputType==Enum.UserInputType.MouseButton1 then
-            drag=true; ds=i.Position; sp=frame.Position
+local function MakeDraggable(frame, handle)
+    handle = handle or frame
+    local dragging = false
+    local dragStart = nil
+    local startPos = nil
+    local activeInput = nil
+
+    handle.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1
+        or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+            activeInput = input
         end
     end)
-    handle.InputEnded:Connect(function(i)
-        if i.UserInputType==Enum.UserInputType.MouseButton1 then drag=false end
+
+    UserInputService.InputChanged:Connect(function(input)
+        if not dragging or not dragStart or not startPos then return end
+        if input.UserInputType == Enum.UserInputType.MouseMovement
+        or input.UserInputType == Enum.UserInputType.Touch then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+        end
     end)
-    UserInputService.InputChanged:Connect(function(i)
-        if drag and i.UserInputType==Enum.UserInputType.MouseMovement then
-            local d=i.Position-ds
-            frame.Position=UDim2.new(sp.X.Scale,sp.X.Offset+d.X,sp.Y.Scale,sp.Y.Offset+d.Y)
+
+    handle.InputEnded:Connect(function(input)
+        if input == activeInput
+        or input.UserInputType == Enum.UserInputType.MouseButton1
+        or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+            dragStart = nil
+            startPos = nil
+            activeInput = nil
+        end
+    end)
+
+    UserInputService.InputEnded:Connect(function(input)
+        if input == activeInput then
+            dragging = false
+            dragStart = nil
+            startPos = nil
+            activeInput = nil
         end
     end)
 end
 local function SectionHeader(parent,text,yPos)
     New("Frame",{Size=UDim2.new(0,3,0,14),Position=UDim2.new(0,10,0,yPos+2),BackgroundColor3=ACCENT,BorderSizePixel=0,Parent=parent})
-    New("TextLabel",{Size=UDim2.new(1,-28,0,18),Position=UDim2.new(0,18,0,yPos),Text=text:upper(),TextColor3=Color3.fromRGB(230,230,240),Font=Enum.Font.GothamBold,TextSize=9,BackgroundTransparency=1,TextXAlignment=Enum.TextXAlignment.Left,Parent=parent})
+    New("TextLabel",{Size=UDim2.new(1,-28,0,18),Position=UDim2.new(0,18,0,yPos),Text=text:upper(),TextColor3=Color3.fromRGB(245,225,255),Font=Enum.Font.GothamBold,TextSize=9,BackgroundTransparency=1,TextXAlignment=Enum.TextXAlignment.Left,Parent=parent})
 end
 
 -- ── PLOT HELPERS ─────────────────────────────────────────
@@ -743,318 +823,86 @@ local function ApplyTraits(model, animalName, traitList)
 end
 
 
-local ANIMAL_DATA = {
-    ["1x1x1x1"] = {gen=1111111,price=255555555},
-    ["25"] = {gen=2500000,price=600000000},
-    ["67"] = {gen=7500000,price=1250000000},
-    ["Agarrini la Palini"] = {gen=425000,price=80000000},
-    ["Alessio"] = {gen=85000,price=17500000},
-    ["Anpali Babel"] = {gen=280000,price=48000000},
-    ["Antonio"] = {gen=55000000,price=12500000000},
-    ["Arcadragon"] = {gen=150000000,price=160000000000},
-    ["Aquanaut"] = {gen=245000,price=45500000},
-    ["Arcadopus"] = {gen=5000000,price=900000000},
-    ["Astrolero Cervalero"] = {gen=280000,price=48000000},
-    ["Bacuru and Egguru"] = {gen=24000000,price=3850000000},
-    ["Ballerina Peppermintina"] = {gen=215000,price=37500000},
-    ["Ballerino Lololo"] = {gen=200000,price=35000000},
-    ["Bambu Bambu Sahur"] = {gen=275000,price=47500000},
-    ["Baskito"] = {gen=16000000,price=2100000000},
-    ["Belula Beluga"] = {gen=290000,price=60000000},
-    ["Bisonte Giuppitere"] = {gen=325000,price=80000000},
-    ["Blackhole Goat"] = {gen=400000,price=75000000},
-    ["Boatito Auratito"] = {gen=525000,price=115000000},
-    ["Boba Panda"] = {gen=270000,price=47000000},
-    ["Bombardini Tortinii"] = {gen=225000,price=50000000},
-    ["Boppin Bunny"] = {gen=80000000,price=25000000000},
-    ["Brainrot God Lucky Block"] = {gen=0,price=25000000},
-    ["Brasilini Berimbini"] = {gen=285000,price=55000000},
-    ["Brr es Teh Patipum"] = {gen=225000,price=40000000},
-    ["Brunito Marsito"] = {gen=3500000,price=750000000},
-    ["Buho de Noelo"] = {gen=267500,price=46750000},
-    ["Bulbito Bandito Traktorito"] = {gen=205000,price=35000000},
-    ["Bunito Bunito Spinito"] = {gen=3000000,price=900000000},
-    ["Bunny Bunny Bunny Sahur"] = {gen=2250000,price=575000000},
-    ["Bunny Tralala"] = {gen=270000,price=47000000},
-    ["Bunny and Eggy"] = {gen=170000000,price=135000000000},
-    ["Bunnyman"] = {gen=1500000,price=500000000},
-    ["Buntteo"] = {gen=850000,price=225000000},
-    ["Burguro And Fryuro"] = {gen=150000000,price=75000000000},
-    ["Burrito Bandito"] = {gen=4000000,price=850000000},
-    ["Cacasito Satalito"] = {gen=240000,price=45000000},
-    ["Capi Taco"] = {gen=155000,price=31000000},
-    ["Capitano Moby"] = {gen=160000000,price=125000000000},
-    ["Cappuccino Clownino"] = {gen=285000,price=48500000},
-    ["Cash or Card"] = {gen=100000000,price=40000000000},
-    ["Celestial Pegasus"] = {gen=175000000,price=150000000000},
-    ["Celularcini Viciosini"] = {gen=22500000,price=2750000000},
-    ["Cerberus"] = {gen=175000000,price=150000000000},
-    ["Chachechi"] = {gen=400000,price=85000000},
-    ["Chicleteira Bicicleteira"] = {gen=3500000,price=750000000},
-    ["Chicleteira Cupideira"] = {gen=17500000,price=2500000000},
-    ["Chicleteira Noelteira"] = {gen=15000000,price=2000000000},
-    ["Chicleteirina Bicicleteirina"] = {gen=4000000,price=850000000},
-    ["Chihuanini Taconini"] = {gen=45000,price=8500000},
-    ["Chill Puppy"] = {gen=4000000,price=850000000},
-    ["Chillin Chili"] = {gen=25000000,price=2500000000},
-    ["Chimnino"] = {gen=14000000,price=1900000000},
-    ["Chipso and Queso"] = {gen=25000000,price=2500000000},
-    ["Chrismasmamat"] = {gen=277500,price=47750000},
-    ["Churrito Bunnito"] = {gen=21000000,price=2600000000},
-    ["Cigno Fulgoro"] = {gen=20000000,price=3000000000},
-    ["Cloverat Clapat"] = {gen=60000000,price=15000000000},
-    ["Clovkur Kurkur"] = {gen=305000,price=70000000},
-    ["Cocoa Assassino"] = {gen=291000,price=61000000},
-    ["Cocofanto Elefanto"] = {gen=19000,price=6500000},
-    ["Coffin Tung Tung Tung Sahur"] = {gen=0,price=500000000},
-    ["Cooki and Milki"] = {gen=155000000,price=100000000000},
-    ["Corn Corn Corn Sahur"] = {gen=250000,price=45000000},
-    ["Crabbo Limonetta"] = {gen=235000,price=46000000},
-    ["Cuadramat and Pakrahmatmamat"] = {gen=1400000,price=400000000},
-    ["Cupid Cupid Sahur"] = {gen=3100000,price=715000000},
-    ["Cupid Hotspot"] = {gen=3500000,price=750000000},
-    ["DJ Panda"] = {gen=17500000,price=2500000000},
-    ["Digi Narwhal"] = {gen=200000000,price=200000000000},
-    ["Divino Platypio"] = {gen=160000,price=32000000},
-    ["Dolphini Jetskini"] = {gen=294500,price=64500000},
-    ["Donkeyturbo Express"] = {gen=7500000,price=1250000000},
-    ["Dragon Cannelloni"] = {gen=250000000,price=250000000000},
-    ["Dragon Gingerini"] = {gen=350000000,price=350000000000},
-    ["Dug dug dug"] = {gen=35000000,price=5000000000},
-    ["Dul Dul Dul"] = {gen=375000,price=150000000},
-    ["Dumborino Miracello"] = {gen=315000,price=75000000},
-    ["Easter Easter Easter Sahur"] = {gen=1250000,price=300000000},
-    ["Eggdin Egg Egg Dun"] = {gen=310000,price=72500000},
-    ["Eid Eid Eid Sahur"] = {gen=3500000,price=750000000},
-    ["Elefanto Frigo"] = {gen=85000000,price=12500000000},
-    ["Esok Sekolah"] = {gen=30000000,price=3500000000},
-    ["Espresso Signora"] = {gen=70000,price=25000000},
-    ["Eviledon"] = {gen=31500000,price=3850000000},
-    ["Extinct Ballerina"] = {gen=125000,price=23500000},
-    ["Extinct Matteo"] = {gen=625000,price=140000000},
-    ["Extinct Tralalero"] = {gen=450000,price=125000000},
-    ["Festive 67"] = {gen=67000000,price=16000000000},
-    ["Fishboard"] = {gen=825000,price=215000000},
-    ["Fishino Clownino"] = {gen=47000000,price=9000000000},
-    ["Fortunu and Cashuru"] = {gen=130000000,price=55000000000},
-    ["Foxini Lanternini"] = {gen=115000000,price=47500000000},
-    ["Fragola La La La"] = {gen=450000,price=125000000},
-    ["Fragrama and Chocrama"] = {gen=100000000,price=40000000000},
-    ["Frankentteo"] = {gen=700000,price=175000000},
-    ["Frio Ninja"] = {gen=265000,price=46500000},
-    ["GOAT"] = {gen=950000,price=237500000},
-    ["Garama and Madundung"] = {gen=50000000,price=10000000000},
-    ["Gattatino Nyanino"] = {gen=35000,price=7500000},
-    ["Gattito Tacoto"] = {gen=165000,price=32500000},
-    ["Giftini Spyderini"] = {gen=999999,price=240000000},
-    ["Ginger Cisterna"] = {gen=293500,price=63500000},
-    ["Ginger Gerat"] = {gen=75000000,price=22500000000},
-    ["Ginger Globo"] = {gen=257500,price=45750000},
-    ["Girafa Celestre"] = {gen=20000,price=7500000},
-    ["Globa Steppa"] = {gen=27500000,price=3000000000},
-    ["Gobblino Uniciclino"] = {gen=27500000,price=2850000000},
-    ["Gold Egg"] = {gen=0,price=0},
-    ["Gold Elf"] = {gen=0,price=0},
-    ["Gold Gold Gold"] = {gen=45000000,price=8000000000},
-    ["Graipuss Medussi"] = {gen=1000000,price=250000000},
-    ["Granchiello Spiritell"] = {gen=260000,price=46000000},
-    ["Granny"] = {gen=4000000,price=850000000},
-    ["Griffin"] = {gen=400000000,price=400000000000},
-    ["Guerriro Digitale"] = {gen=550000,price=120000000},
-    ["Guest 666"] = {gen=6666666,price=1166666666},
-    ["Gym Bros"] = {gen=42500000,price=7500000000},
-    ["Headless Horseman"] = {gen=550000000,price=550000000000},
-    ["Ho Ho Ho Sahur"] = {gen=3250000,price=725000000},
-    ["Hopilikalika Hopilikalako"] = {gen=55000000,price=12500000000},
-    ["Horegini Boom"] = {gen=2750000,price=650000000},
-    ["Hydra Bunny"] = {gen=185000000,price=175000000000},
-    ["Hydra Dragon Cannelloni"] = {gen=300000000,price=300000000000},
-    ["Jacko Jack Jack"] = {gen=150000,price=30000000},
-    ["Jackorilla"] = {gen=315000,price=80000000},
-    ["Job Job Job Sahur"] = {gen=700000,price=175000000},
-    ["Jolly Jolly Sahur"] = {gen=45000000,price=8000000000},
-    ["Karker Sahur"] = {gen=725000,price=185000000},
-    ["Karkerheart Luvkur"] = {gen=297500,price=67500000},
-    ["Karkerkar Kurkur"] = {gen=325000,price=80000000},
-    ["Ketchuru and Musturu"] = {gen=42500000,price=7500000000},
-    ["Ketupat Bros"] = {gen=145000000,price=65000000000},
-    ["Ketupat Kepat"] = {gen=35000000,price=5000000000},
-    ["Krupuk Pagi Pagi"] = {gen=290000,price=60000000},
-    ["La Casa Boo"] = {gen=100000000,price=40000000000},
-    ["La Cucaracha"] = {gen=475000,price=110000000},
-    ["La Easter Grande"] = {gen=55000000,price=12500000000},
-    ["La Extinct Grande"] = {gen=23500000,price=3250000000},
-    ["La Food Combinasion"] = {gen=90000000,price=30000000000},
-    ["La Ginger Sekolah"] = {gen=75000000,price=23000000000},
-    ["La Grande Combinasion"] = {gen=10000000,price=1000000000},
-    ["La Jolly Grande"] = {gen=30000000,price=3500000000},
-    ["La Karkerkar Combinasion"] = {gen=600000,price=160000000},
-    ["La Lucky Grande"] = {gen=40000000,price=7000000000},
-    ["La Romantic Grande"] = {gen=40000000,price=7000000000},
-    ["La Sahur Combinasion"] = {gen=2000000,price=550000000},
-    ["La Secret Combinasion"] = {gen=125000000,price=50000000000},
-    ["La Spooky Grande"] = {gen=24500000,price=2900000000},
-    ["La Supreme Combinasion"] = {gen=200000000,price=200000000000},
-    ["La Taco Combinasion"] = {gen=35000000,price=5000000000},
-    ["La Vacca Jacko Linterino"] = {gen=850000,price=225000000},
-    ["La Vacca Lepre Lepreino"] = {gen=1100000,price=255000000},
-    ["La Vacca Prese Presente"] = {gen=600000,price=160000000},
-    ["La Vacca Saturno Saturnita"] = {gen=325000,price=80000000},
-    ["Las Capuchinas"] = {gen=185000,price=32500000},
-    ["Las Sis"] = {gen=17500000,price=2500000000},
-    ["Las Tralaleritas"] = {gen=650000,price=150000000},
-    ["Las Vaquitas Saturnitas"] = {gen=750000,price=200000000},
-    ["Lavadorito Spinito"] = {gen=45000000,price=8000000000},
-    ["List List List Sahur"] = {gen=2000000,price=550000000},
-    ["Los 25"] = {gen=10000000,price=1500000000},
-    ["Los 67"] = {gen=22500000,price=2750000000},
-    ["Los Amigos"] = {gen=130000000,price=55000000000},
-    ["Los Bombinitos"] = {gen=220000,price=42500000},
-    ["Los Bros"] = {gen=24000000,price=2600000000},
-    ["Los Bunitos"] = {gen=4250000,price=865000000},
-    ["Los Burritos"] = {gen=8500000,price=1400000000},
-    ["Los Candies"] = {gen=23000000,price=3000000000},
-    ["Los Chicleteiras"] = {gen=7000000,price=1200000000},
-    ["Los Chihuaninis"] = {gen=160000,price=32000000},
-    ["Los Combinasionas"] = {gen=15000000,price=2000000000},
-    ["Los Crocodillitos"] = {gen=55000,price=12500000},
-    ["Los Cucarachas"] = {gen=1250000,price=300000000},
-    ["Los Cupids"] = {gen=30000000,price=3500000000},
-    ["Los Gattitos"] = {gen=275000,price=47500000},
-    ["Los Hotspotsitos"] = {gen=20000000,price=3000000000},
-    ["Los Jobcitos"] = {gen=1500000,price=500000000},
-    ["Los Jolly Combinasionas"] = {gen=20000000,price=3000000000},
-    ["Los Karkeritos"] = {gen=750000,price=200000000},
-    ["Los Matteos"] = {gen=325000,price=80000000},
-    ["Los Mi Gatitos"] = {gen=6500000,price=1250000000},
-    ["Los Mobilis"] = {gen=22000000,price=2700000000},
-    ["Los Nooo My Hotspotsitos"] = {gen=5500000,price=1000000000},
-    ["Los Orcalitos"] = {gen=235000,price=45000000},
-    ["Los Planitos"] = {gen=18500000,price=2750000000},
-    ["Los Primos"] = {gen=31000000,price=3750000000},
-    ["Los Puggies"] = {gen=30000000,price=3000000000},
-    ["Los Quesadillas"] = {gen=4500000,price=875000000},
-    ["Los Sekolahs"] = {gen=110000000,price=45000000000},
-    ["Los Spaghettis"] = {gen=70000000,price=20000000000},
-    ["Los Spooky Combinasionas"] = {gen=20000000,price=3000000000},
-    ["Los Spyderinis"] = {gen=425000,price=125000000},
-    ["Los Sweethearts"] = {gen=16500000,price=2250000000},
-    ["Los Tacoritas"] = {gen=32000000,price=4000000000},
-    ["Los Tipi Tacos"] = {gen=260000,price=46000000},
-    ["Los Tortus"] = {gen=500000,price=100000000},
-    ["Los Tralaleritos"] = {gen=500000,price=100000000},
-    ["Los Trios"] = {gen=700000,price=175000000},
-    ["Los Tungtungtungcitos"] = {gen=210000,price=37500000},
-    ["Love Love Bear"] = {gen=225000000,price=225000000000},
-    ["Love Love Love Sahur"] = {gen=1000000,price=250000000},
-    ["Lovin Rose"] = {gen=32500000,price=4250000000},
-    ["Luck Luck Luck Sahur"] = {gen=3750000,price=800000000},
-    ["Luv Luv Luv"] = {gen=282500,price=48250000},
-    ["Mariachi Corazoni"] = {gen=12500000,price=1750000000},
-    ["Mastodontico Telepiedone"] = {gen=275000,price=47500000},
-    ["Matteo"] = {gen=50000,price=10000000},
-    ["Meowl"] = {gen=600000000,price=600000000000},
-    ["John Pork"] = {gen=500000000,price=650000000000},
-    ["Mi Gatito"] = {gen=3250000,price=725000000},
-    ["Mieteteira Bicicleteira"] = {gen=26000000,price=2750000000},
-    ["Money Money Bros"] = {gen=47000000,price=9000000000},
-    ["Money Money Man"] = {gen=65000,price=17500000},
-    ["Money Money Puggy"] = {gen=21000000,price=2600000000},
-    ["Money Money Reindeer"] = {gen=25000000,price=2500000000},
-    ["Mummy Ambalabu"] = {gen=250000,price=45000000},
-    ["Nacho Spyder"] = {gen=50000000,price=10000000000},
-    ["Naughty Naughty"] = {gen=3000000,price=700000000},
-    ["Noo La Polizia"] = {gen=280000,price=67000000},
-    ["Noo my Candy"] = {gen=5000000,price=900000000},
-    ["Noo my Eggs"] = {gen=7000000,price=1200000000},
-    ["Noo my Gold"] = {gen=13500000,price=1850000000},
-    ["Noo my Heart"] = {gen=13000000,price=1800000000},
-    ["Noo my Present"] = {gen=6000000,price=1100000000},
-    ["Noo my examine"] = {gen=1750000,price=525000000},
-    ["Nooo My Hotspot"] = {gen=1500000,price=500000000},
-    ["Nuclearo Dinossauro"] = {gen=15000000,price=2500000000},
-    ["Odin Din Din Dun"] = {gen=75000,price=15000000},
-    ["Orcaledon"] = {gen=40000000,price=7000000000},
-    ["Orcalero Orcala"] = {gen=100000,price=25000000},
-    ["Orcalita Orcala"] = {gen=240000,price=45000000},
-    ["Pakrahmatmamat"] = {gen=215000,price=37500000},
-    ["Pakrahmatmatina"] = {gen=225000,price=40500000},
-    ["Pancake and Syrup"] = {gen=125000000,price=50000000000},
-    ["Pandanini Frostini"] = {gen=294000,price=64000000},
-    ["Paradiso Axolottino"] = {gen=900000,price=235000000},
-    ["Patteo"] = {gen=287500,price=57500000},
-    ["Perrito Burrito"] = {gen=1000000,price=250000000},
-    ["Piccione Macchina"] = {gen=225000,price=40000000},
-    ["Piccionetta Macchina"] = {gen=270000,price=47000000},
-    ["Pirulitoita Bicicleteira"] = {gen=2500000,price=600000000},
-    ["Please my Present"] = {gen=1300000,price=350000000},
-    ["Pop Pop Sahur"] = {gen=295000,price=65000000},
-    ["Popcuru and Fizzuru"] = {gen=170000000,price=135000000000},
-    ["Pot Hotspot"] = {gen=2500000,price=600000000},
-    ["Pot Pumpkin"] = {gen=3000000,price=700000000},
-    ["Pumpkini Spyderini"] = {gen=650000,price=165000000},
-    ["Quackini Snackini"] = {gen=65000000,price=15500000000},
-    ["Quesadilla Crocodila"] = {gen=3000000,price=700000000},
-    ["Quesadillo Vampiro"] = {gen=3500000,price=750000000},
-    ["Rang Ring Bus"] = {gen=6000000,price=1100000000},
-    ["Reindeer Tralala"] = {gen=600000,price=160000000},
-    ["Reinito Sleighito"] = {gen=140000000,price=60000000000},
-    ["Rocco Disco"] = {gen=650000,price=150000000},
-    ["Rosetti Tualetti"] = {gen=50000000,price=10000000000},
-    ["Rosey and Teddy"] = {gen=165000000,price=130000000000},
-    ["Sammyni Fattini"] = {gen=70000000,price=20000000000},
-    ["Sammyni Spyderini"] = {gen=325000,price=75000000},
-    ["Santa Hotspot"] = {gen=2600000,price=625000000},
-    ["Santteo"] = {gen=800000,price=210000000},
-    ["Secret Lucky Block"] = {gen=0,price=750000000},
-    ["Serafinna Medusella"] = {gen=5500000,price=1000000000},
-    ["Signore Carapace"] = {gen=105000000,price=42500000000},
-    ["Skibidi Toilet"] = {gen=450000000,price=450000000000},
-    ["Skull Skull Skull"] = {gen=290000,price=60000000},
-    ["Snailenzo"] = {gen=250000,price=45000000},
-    ["Snailo Clovero"] = {gen=18500000,price=2750000000},
-    ["Spaghetti Tualetti"] = {gen=60000000,price=15000000000},
-    ["Spinny Hammy"] = {gen=17000000,price=2300000000},
-    ["Spooky and Pumpky"] = {gen=80000000,price=25000000000},
-    ["Squalanana"] = {gen=250000,price=45000000},
-    ["Strawberry Elephant"] = {gen=750000000,price=750000000000},
-    ["Swag Soda"] = {gen=13000000,price=1800000000},
-    ["Swaggy Bros"] = {gen=40000000,price=7000000000},
-    ["Tacorillo Crocodillo"] = {gen=12500000,price=1500000000},
-    ["Tacorita Bicicleta"] = {gen=16500000,price=2250000000},
-    ["Tang Tang Keletang"] = {gen=33500000,price=4500000000},
-    ["Tartaruga Cisterna"] = {gen=250000,price=45000000},
-    ["Telemorte"] = {gen=2000000,price=550000000},
-    ["Tentacolo Tecnico"] = {gen=292500,price=62500000},
-    ["Tictac Sahur"] = {gen=37500000,price=6000000000},
-    ["Tigroligre Frutonni"] = {gen=60000,price=14000000},
-    ["Tipi Topi Taco"] = {gen=75000,price=20000000},
-    ["Tirilikalika Tirilikalako"] = {gen=42500000,price=7500000000},
-    ["To to to Sahur"] = {gen=2250000,price=575000000},
-    ["Tootini Shrimpini"] = {gen=260000,price=46000000},
-    ["Torrtuginni Dragonfrutini"] = {gen=350000,price=125000000},
-    ["Tractoro Dinosauro"] = {gen=230000,price=42500000},
-    ["Tralaledon"] = {gen=27500000,price=3000000000},
-    ["Tralalero Tralala"] = {gen=50000,price=10000000},
-    ["Tralalita Tralala"] = {gen=100000,price=20000000},
-    ["Trenostruzzo Turbo 3000"] = {gen=150000,price=25000000},
-    ["Trenostruzzo Turbo 4000"] = {gen=335000,price=90000000},
-    ["Trickolino"] = {gen=900000,price=235000000},
-    ["Triplito Tralaleritos"] = {gen=875000,price=230000000},
-    ["Trippi Troppi Troppa Trippa"] = {gen=175000,price=30000000},
-    ["Tuff Toucan"] = {gen=26000000,price=2750000000},
-    ["Tukanno Bananno"] = {gen=100000,price=22500000},
-    ["Tung Tung Tung Sahur"] = {gen=1500000,price=500000000},
-    ["Unclito Samito"] = {gen=75000,price=20000000},
-    ["Urubini Flamenguini"] = {gen=150000,price=30000000},
-    ["Vampira Cappucina"] = {gen=125000,price=24500000},
-    ["Ventoliero Pavonero"] = {gen=65000000,price=15500000000},
-    ["Vulturino Skeletono"] = {gen=500000,price=110000000},
-    ["W or L"] = {gen=30000000,price=3000000000},
-    ["Yess my examine"] = {gen=575000,price=130000000},
-    ["Yeti Claus"] = {gen=257500,price=45750000},
-    ["Zombie Tralala"] = {gen=500000,price=100000000},
-}
+-- ANIMAL_DATA берется напрямую из RS.Datas.Animals (lazy)
+local _AnimalDataCache = nil
+local function _GetAnimalDataModule()
+    if _AnimalDataCache then return _AnimalDataCache end
+    local ok, mod = pcall(function() return require(RS.Datas.Animals) end)
+    if ok and type(mod) == "table" then
+        _AnimalDataCache = mod
+    else
+        _AnimalDataCache = {}
+    end
+    return _AnimalDataCache
+end
+
+local ANIMAL_DATA = setmetatable({}, {
+    __index = function(_, name)
+        local mod = _GetAnimalDataModule()
+        local d = mod[name]
+        if not d then return nil end
+        return {
+            gen   = d.Generation or 0,
+            price = d.Price or 0,
+            rarity = d.Rarity or "Common",
+            displayName = d.DisplayName or name,
+        }
+    end,
+})
+
+
+-- ── GAME-DATA HELPERS (трейты и мутации из игры) ──────────
+local function GetTraitInfo(name)
+    local ok, data = pcall(function() return require(RS.Datas.Traits) end)
+    if not ok or type(data) ~= "table" then return nil end
+    return data[name]
+end
+
+local function GetTraitDisplay(name)
+    local info = GetTraitInfo(name)
+    if not info then return name end
+    return info.Display or info.DisplayWithRichText or name
+end
+
+local function GetTraitRichDisplay(name)
+    local info = GetTraitInfo(name)
+    if not info then return name end
+    return info.DisplayWithRichText or info.Display or name
+end
+
+local function GetTraitColor(name)
+    local info = GetTraitInfo(name)
+    if not info then return Color3.new(1,1,1) end
+    return info.Color or Color3.new(1,1,1)
+end
+
+local function GetMutationInfo(name)
+    if name == "None" then return nil end
+    local ok, data = pcall(function() return require(RS.Datas.Mutations) end)
+    if not ok or type(data) ~= "table" then return nil end
+    return data[name]
+end
+
+local function GetMutationDisplay(name)
+    if name == "None" then return "None" end
+    local info = GetMutationInfo(name)
+    if not info then return name end
+    return info.DisplayText or info.Display or name
+end
+
+local function GetMutationRichDisplay(name)
+    if name == "None" then return "None" end
+    local info = GetMutationInfo(name)
+    if not info then return name end
+    return info.DisplayWithRichText or info.DisplayText or name
+end
+
+local function GetMutationColor(name)
+    local info = GetMutationInfo(name)
+    if not info then return Color3.new(1,1,1) end
+    return info.MainColor or info.Color or Color3.new(1,1,1)
+end
+
 
 -- ── STATE ────────────────────────────────────────────────
 local selectedAnimal   = nil
@@ -2191,21 +2039,8 @@ local function StartCarry(model, slotIdx, grabPrompt)
 
             -- use this model's snapshot (not current UI selection)
             local snap = modelSnapshots[model] or {mutation = "None", traits = {}}
-            local GHOST_MUT_MOD = {Gold=0.25,Diamond=0.5,Bloodrot=1,Rainbow=9,Candy=3,Lava=5,Galaxy=6,YinYang=6.5,Radioactive=7.5,Cursed=8,Divine=9,Cyber=10}
-            local GHOST_TRAIT_MOD = {
-                Taco=2, Nyan=5, Galactic=3, Fireworks=5, Zombie=4, Claws=4,
-                Glitched=4, Bubblegum=3, Fire=5, Wet=1.5, Snowy=2, Cometstruck=2.5,
-                Explosive=3, Disco=4, ["10B"]=3, ["Shark Fin"]=3, ["Matteo Hat"]=3.5,
-                Brazil=5, Sleepy=0, Lightning=5, UFO=2, Spider=3.5, Strawberry=8,
-                Paint=5, Skeleton=3, Sombrero=4, Tie=3.75, ["Witch Hat"]=3,
-                Indonesia=4, Meowl=7, ["John Pork"]=6.5, ["RIP Gravestone"]=3.5, ["Jackolantern Pet"]=4.5,
-                ["Santa Hat"]=4, ["Reindeer Pet"]=5, Skibidi=6, ["26"]=5, Rose=5,
-                [":3"]=4.5, Chocolate=4.5, Halo=5, Lucky=5, ["Orange Balloon"]=3,
-                ["Green Balloon"]=3.5, ["Blue Balloon"]=4, ["Red Balloon"]=5,
-                ["Pink Balloon"]=5.5, ["Rainbow Balloon"]=6.5, Granny=5.5,
-                ["Bunny Ears"]=4.5, ["Orange Egg"]=3, ["Green Egg"]=4,
-                ["Blue Egg"]=5, ["Pink Egg"]=6.5,
-            }
+            local GHOST_MUT_MOD = MUTATION_MODIFIERS
+            local GHOST_TRAIT_MOD = TRAIT_MULTIPLIERS
             local ghostMutMod = GHOST_MUT_MOD[snap.mutation] or 0
             local ghostTraitMod = 0
             for _, trait in ipairs(snap.traits or {}) do
@@ -2680,6 +2515,104 @@ PlaceModelOnSlot = function(model, slotIdx, animalName)
     end
     StopCarry()
     model:PivotTo(spawnPart:GetPivot())
+
+    -- ═══ SUNSET_SPAWN_EFFECT ═══
+    task.spawn(function()
+        pcall(function()
+            local pos = spawnPart.Position + Vector3.new(0, 2, 0)
+
+            local flash = Instance.new("Part")
+            flash.Shape = Enum.PartType.Ball
+            flash.Size = Vector3.new(1, 1, 1)
+            flash.CFrame = CFrame.new(pos)
+            flash.Anchored = true
+            flash.CanCollide = false
+            flash.CanQuery = false
+            flash.CanTouch = false
+            flash.Material = Enum.Material.Neon
+            flash.Color = Color3.fromRGB(170, 0, 255)
+            flash.Transparency = 0
+            flash.Parent = workspace
+
+            local light = Instance.new("PointLight")
+            light.Color = Color3.fromRGB(170, 0, 255)
+            light.Range = 30
+            light.Brightness = 10
+            light.Parent = flash
+
+            local TS2 = game:GetService("TweenService")
+            TS2:Create(flash, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                Size = Vector3.new(20, 20, 20), Transparency = 1
+            }):Play()
+            TS2:Create(light, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                Brightness = 0, Range = 0
+            }):Play()
+            task.delay(0.7, function() pcall(function() flash:Destroy() end) end)
+
+            local smokePart = Instance.new("Part")
+            smokePart.Size = Vector3.new(1, 1, 1)
+            smokePart.CFrame = CFrame.new(pos)
+            smokePart.Anchored = true
+            smokePart.CanCollide = false
+            smokePart.CanQuery = false
+            smokePart.CanTouch = false
+            smokePart.Transparency = 1
+            smokePart.Parent = workspace
+
+            local smoke = Instance.new("Smoke")
+            smoke.Color = Color3.fromRGB(170, 0, 255)
+            smoke.Size = 5
+            smoke.RiseVelocity = 12
+            smoke.Opacity = 0.6
+            smoke.Parent = smokePart
+
+            task.delay(1.5, function()
+                pcall(function()
+                    TS2:Create(smoke, TweenInfo.new(1.5), {Opacity = 0, Size = 15}):Play()
+                    task.wait(1.5)
+                    smokePart:Destroy()
+                end)
+            end)
+
+            local sparksPart = Instance.new("Part")
+            sparksPart.Size = Vector3.new(1, 1, 1)
+            sparksPart.CFrame = CFrame.new(pos)
+            sparksPart.Anchored = true
+            sparksPart.CanCollide = false
+            sparksPart.CanQuery = false
+            sparksPart.CanTouch = false
+            sparksPart.Transparency = 1
+            sparksPart.Parent = workspace
+
+            local particles = Instance.new("ParticleEmitter")
+            particles.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(200, 100, 255)),
+                ColorSequenceKeypoint.new(0.5, Color3.fromRGB(170, 0, 255)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 0, 180))
+            })
+            particles.Size = NumberSequence.new({
+                NumberSequenceKeypoint.new(0, 1),
+                NumberSequenceKeypoint.new(1, 0)
+            })
+            particles.Transparency = NumberSequence.new({
+                NumberSequenceKeypoint.new(0, 0),
+                NumberSequenceKeypoint.new(1, 1)
+            })
+            particles.Lifetime = NumberRange.new(0.8, 1.5)
+            particles.Rate = 100
+            particles.Speed = NumberRange.new(15, 30)
+            particles.SpreadAngle = Vector2.new(180, 180)
+            particles.LightEmission = 1
+            particles.LightInfluence = 0
+            particles.Parent = sparksPart
+
+            task.delay(0.3, function()
+                particles.Enabled = false
+                task.delay(1.5, function() pcall(function() sparksPart:Destroy() end) end)
+            end)
+        end)
+    end)
+
 
     -- Clean up the OLD slot AFTER StopCarry (so the carry-restore can't re-enable
     -- prompts we want gone). This kills any lingering Grab/Sell on the source slot
@@ -3179,65 +3112,63 @@ PlaceModelOnSlot = function(model, slotIdx, animalName)
 end
 local nextSlot         = 1
 
-local TRAIT_MULTIPLIERS = {
-    ["Taco"]=2, ["Nyan"]=5, ["Galactic"]=3, ["Fireworks"]=5, ["Zombie"]=4,
-    ["Claws"]=4, ["Glitched"]=4, ["Bubblegum"]=3, ["Fire"]=5, ["Wet"]=1.5,
-    ["Snowy"]=2, ["Cometstruck"]=2.5, ["Explosive"]=3, ["Disco"]=4, ["10B"]=3,
-    ["Shark Fin"]=3, ["Matteo Hat"]=3.5, ["Brazil"]=5, ["Sleepy"]=0,
-    ["Lightning"]=5, ["UFO"]=2, ["Spider"]=3.5, ["Strawberry"]=8, ["Paint"]=5,
-    ["Skeleton"]=3, ["Sombrero"]=4, ["Tie"]=3.75, ["Witch Hat"]=3,
-    ["Indonesia"]=4, ["Meowl"]=7, ["John Pork"]=6.5, ["RIP Gravestone"]=3.5, ["Jackolantern Pet"]=4.5,
-    ["Santa Hat"]=4, ["Reindeer Pet"]=5, ["Skibidi"]=6, ["26"]=5, ["Rose"]=5,
-    [":3"]=4.5, ["Chocolate"]=4.5, ["Halo"]=5, ["Lucky"]=5,
-    ["Orange Balloon"]=3, ["Green Balloon"]=3.5, ["Blue Balloon"]=4,
-    ["Red Balloon"]=5, ["Pink Balloon"]=5.5, ["Rainbow Balloon"]=6.5,
-    ["Granny"]=5.5, ["Bunny Ears"]=4.5,
-    ["Orange Egg"]=3, ["Green Egg"]=4, ["Blue Egg"]=5, ["Pink Egg"]=6.5,
-}
-local MUTATION_MODIFIERS = {
-    ["Gold"]=0.25, ["Diamond"]=0.5, ["Bloodrot"]=1, ["Rainbow"]=9,
-    ["Candy"]=3, ["Lava"]=5, ["Galaxy"]=6, ["YinYang"]=6.5,
-    ["Radioactive"]=7.5, ["Cursed"]=8, ["Divine"]=9, ["Cyber"]=10,
-}
-for name, data in pairs(LIVE_MUTATION_DATA) do
-    if type(data) == "table" and type(data.Modifier) == "number" then
-        MUTATION_MODIFIERS[name] = data.Modifier
-    end
-end
-for name, data in pairs(LIVE_TRAIT_DATA) do
-    if type(data) == "table" and type(data.MultiplierModifier) == "number" then
-        TRAIT_MULTIPLIERS[name] = data.MultiplierModifier
-    end
-end
-
+local TRAIT_MULTIPLIERS = setmetatable({}, {
+    __index = function(_, name)
+        local ok, data = pcall(function() return require(RS.Datas.Traits) end)
+        if not ok or type(data) ~= "table" then return 0 end
+        local info = data[name]
+        if not info then return 0 end
+        return info.MultiplierModifier or 0
+    end,
+})
+local MUTATION_MODIFIERS = setmetatable({}, {
+    __index = function(_, name)
+        if name == "None" then return 0 end
+        local ok, data = pcall(function() return require(RS.Datas.Mutations) end)
+        if not ok or type(data) ~= "table" then return 0 end
+        local info = data[name]
+        if not info then return 0 end
+        return info.Modifier or info.Multiplier or 0
+    end,
+})
 -- exact GetGeneration formula from Shared.Animals decompile
 local function CalcGeneration(animalName, mutation, traits)
+    -- Сначала пробуем игровую функцию
+    local sa = GetSharedAnimals()
+    if sa and sa.GetGeneration then
+        local traitsArr = {}
+        if type(traits) == "table" then
+            for t, on in pairs(traits) do
+                if on then table.insert(traitsArr, t) end
+            end
+        end
+        local ok, result = pcall(function()
+            return sa:GetGeneration(
+                animalName,
+                (mutation and mutation ~= "None") and mutation or nil,
+                #traitsArr > 0 and traitsArr or nil,
+                LocalPlayer
+            )
+        end)
+        if ok and type(result) == "number" and result > 0 then
+            return result
+        end
+    end
+
+    -- Fallback: считаем сами, множители из игры через прокси
     local info = ANIMAL_DATA[animalName]
     local base = info and (info.gen or 0) or 0
-    -- fallback to Datas.Animals for animals not in ANIMAL_DATA
-    if base == 0 then
-        pcall(function()
-            local RS2 = game:GetService("ReplicatedStorage")
-            local aData = require(RS2.Datas.Animals)[animalName]
-            if aData and aData.Generation then base = aData.Generation end
-        end)
-    end
     if base == 0 then return 0 end
     local multiplier = 1
-    -- mutation modifier
-    if mutation and mutation ~= "None" and MUTATION_MODIFIERS[mutation] then
-        multiplier = multiplier + MUTATION_MODIFIERS[mutation]
+    if mutation and mutation ~= "None" then
+        multiplier = multiplier + (MUTATION_MODIFIERS[mutation] or 0)
     end
-    -- trait modifiers
     local sleepy = false
     if traits then
         for trait, on in pairs(traits) do
             if on then
-                if trait == "Sleepy" then
-                    sleepy = true
-                elseif TRAIT_MULTIPLIERS[trait] then
-                    multiplier = multiplier + TRAIT_MULTIPLIERS[trait]
-                end
+                if trait == "Sleepy" then sleepy = true
+                else multiplier = multiplier + (TRAIT_MULTIPLIERS[trait] or 0) end
             end
         end
     end
@@ -3246,21 +3177,23 @@ local function CalcGeneration(animalName, mutation, traits)
     return math.floor(gen)
 end
 
-local MUTATION_ICONS = {
-    ["None"]        = "",
-    ["Gold"]        = "rbxassetid://136133057822407",
-    ["Diamond"]     = "rbxassetid://100875709547015",
-    ["Bloodrot"]    = "rbxassetid://75212036784031",
-    ["Rainbow"]     = "rbxassetid://83078714090192",
-    ["Candy"]       = "rbxassetid://84797673698685",
-    ["Lava"]        = "rbxassetid://70800471498231",
-    ["Galaxy"]      = "rbxassetid://139331671405138",
-    ["YinYang"]     = "rbxassetid://112996178302302",
-    ["Radioactive"] = "rbxassetid://134809510446754",
-    ["Cursed"]      = "rbxassetid://139160534192980",
-    ["Divine"]      = "rbxassetid://117437279650650",
-    ["Cyber"]       = "rbxassetid://91596580591665",
-}
+local MUTATION_ICONS = setmetatable({None = ""}, {
+    __index = function(_, name)
+        if name == "None" then return "" end
+        local ok, data = pcall(function() return require(RS.Datas.Mutations) end)
+        if not ok or type(data) ~= "table" then return nil end
+        local info = data[name]
+        if not info then return nil end
+        local icon = info.Icon or info.Image or info.Texture
+        if type(icon) == "number" then return "rbxassetid://"..tostring(icon) end
+        if type(icon) == "string" then
+            if icon:match("^rbxassetid://") then return icon end
+            if icon:match("^%d+$") then return "rbxassetid://"..icon end
+            return icon
+        end
+        return nil
+    end,
+})
 
 local TRAIT_ICONS = {
     ["10B"]             = "rbxassetid://134655415681926",
@@ -3318,12 +3251,6 @@ local TRAIT_ICONS = {
     ["Witch Hat"]       = "rbxassetid://123964048606874",
     ["Zombie"]          = "rbxassetid://110723387483939",
 }
-for name, data in pairs(LIVE_MUTATION_DATA) do
-    if type(data) == "table" then
-        local icon = _iconAsset(data.Icon or data.Image or data.Texture)
-        if icon then MUTATION_ICONS[name] = icon end
-    end
-end
 for name, data in pairs(LIVE_TRAIT_DATA) do
     if type(data) == "table" then
         local icon = _iconAsset(data.Icon or data.Image or data.Texture)
@@ -3331,43 +3258,43 @@ for name, data in pairs(LIVE_TRAIT_DATA) do
     end
 end
 
-local RUBY_GRADIENTS = {}
-local RUBY_RUN_ID = tostring(os.clock()) .. ":" .. tostring(math.random())
-_G.RubyccRunId = RUBY_RUN_ID
-local RUBY_SEQUENCE = ColorSequence.new({
-    ColorSequenceKeypoint.new(0.00, Color3.fromRGB(80, 0, 18)),
-    ColorSequenceKeypoint.new(0.22, Color3.fromRGB(225, 18, 48)),
-    ColorSequenceKeypoint.new(0.50, Color3.fromRGB(255, 72, 92)),
-    ColorSequenceKeypoint.new(0.76, Color3.fromRGB(175, 5, 35)),
-    ColorSequenceKeypoint.new(1.00, Color3.fromRGB(55, 0, 14)),
+local SUNSET_GRADIENTS = {}
+local SUNSET_RUN_ID = tostring(os.clock()) .. ":" .. tostring(math.random())
+_G.SunsetXRunId = SUNSET_RUN_ID
+local SUNSET_SEQUENCE = ColorSequence.new({
+    ColorSequenceKeypoint.new(0.00, Color3.fromRGB(170, 0, 255)),
+    ColorSequenceKeypoint.new(0.22, Color3.fromRGB(170, 0, 255)),
+    ColorSequenceKeypoint.new(0.50, Color3.fromRGB(220, 50, 255)),
+    ColorSequenceKeypoint.new(0.76, Color3.fromRGB(100, 0, 180)),
+    ColorSequenceKeypoint.new(1.00, Color3.fromRGB(60, 0, 120)),
 })
-local RUBY_DARK_SEQUENCE = ColorSequence.new({
-    ColorSequenceKeypoint.new(0.00, Color3.fromRGB(32, 7, 13)),
-    ColorSequenceKeypoint.new(0.42, Color3.fromRGB(10, 9, 11)),
-    ColorSequenceKeypoint.new(0.72, Color3.fromRGB(48, 8, 17)),
-    ColorSequenceKeypoint.new(1.00, Color3.fromRGB(12, 9, 11)),
+local SUNSET_DARK_SEQUENCE = ColorSequence.new({
+    ColorSequenceKeypoint.new(0.00, Color3.fromRGB(35, 5, 55)),
+    ColorSequenceKeypoint.new(0.42, Color3.fromRGB(12, 0, 22)),
+    ColorSequenceKeypoint.new(0.72, Color3.fromRGB(60, 10, 90)),
+    ColorSequenceKeypoint.new(1.00, Color3.fromRGB(15, 0, 25)),
 })
 
-local function RubyGradient(parent, dark)
+local function SunsetGradient(parent, dark)
     local gradient = Instance.new("UIGradient")
-    gradient.Color = dark and RUBY_DARK_SEQUENCE or RUBY_SEQUENCE
+    gradient.Color = dark and SUNSET_DARK_SEQUENCE or SUNSET_SEQUENCE
     gradient.Rotation = 0
     gradient.Parent = parent
-    RUBY_GRADIENTS[#RUBY_GRADIENTS + 1] = gradient
+    SUNSET_GRADIENTS[#SUNSET_GRADIENTS + 1] = gradient
     return gradient
 end
 
 task.spawn(function()
     local phase = 0
-    while _G.RubyccRunId == RUBY_RUN_ID do
+    while _G.SunsetXRunId == SUNSET_RUN_ID do
         task.wait(0.12)
         phase = phase + 2
-        for index = #RUBY_GRADIENTS, 1, -1 do
-            local gradient = RUBY_GRADIENTS[index]
+        for index = #SUNSET_GRADIENTS, 1, -1 do
+            local gradient = SUNSET_GRADIENTS[index]
             if gradient and gradient.Parent then
                 gradient.Rotation = (phase + index * 19) % 360
             else
-                table.remove(RUBY_GRADIENTS, index)
+                table.remove(SUNSET_GRADIENTS, index)
             end
         end
     end
@@ -3380,9 +3307,9 @@ local function Stroke(parent, color, thickness, trans)
     return s
 end
 
-local function RubyBorder(parent, thickness, transparency)
+local function SunsetBorder(parent, thickness, transparency)
     local border = Stroke(parent, Color3.new(1,1,1), thickness or 1.5, transparency or 0)
-    RubyGradient(border, false)
+    SunsetGradient(border, false)
     return border
 end
 
@@ -3652,11 +3579,11 @@ end
 local function _buildAndRun()
 
 -- ── ROOT GUI ─────────────────────────────────────────────
-if GetSafeParent():FindFirstChild("RubyccSpawner") then
-    GetSafeParent():FindFirstChild("RubyccSpawner"):Destroy()
+if GetSafeParent():FindFirstChild("SunsetSpawnerXFakeTrade") then
+    GetSafeParent():FindFirstChild("SunsetSpawnerXFakeTrade"):Destroy()
 end
 local sg = New("ScreenGui", {
-    Name="RubyccSpawner", ResetOnSpawn=false, IgnoreGuiInset=true,
+    Name="SunsetSpawnerXFakeTrade", ResetOnSpawn=false, IgnoreGuiInset=true,
     ZIndexBehavior=Enum.ZIndexBehavior.Sibling, DisplayOrder=5000,
     Parent=GetSafeParent(),
 })
@@ -3692,15 +3619,15 @@ local win = New("Frame", {
     ClipsDescendants=false,
 })
 Corner(win, 8)
-RubyBorder(win, 1.6, 0.02)
+SunsetBorder(win, 1.6, 0.02)
 
 -- 🌌 IMAGEN DE FONDO (ruby.cc style) — same asset as the ruby.cc lagger
 local winBg = New("ImageLabel", {
     Name="BackgroundImage",
     Size=UDim2.new(1,0,1,0), Position=UDim2.new(0,0,0,0),
     BackgroundTransparency=1,
-    Image="rbxassetid://91913354601532",
-    ImageColor3=Color3.fromRGB(155,35,48),
+    Image="rbxassetid://135730318591850",
+    ImageColor3=Color3.fromRGB(170,0,255),
     ImageTransparency=0.55,
     ScaleType=Enum.ScaleType.Crop,
     ZIndex=0, BorderSizePixel=0, Parent=win,
@@ -3722,25 +3649,25 @@ New("UIGradient", {
 -- title bar
 local tbar = New("Frame", {
     Size=UDim2.new(1,0,0,30),
-    BackgroundColor3=Color3.fromRGB(16,9,12),
+    BackgroundColor3=Color3.fromRGB(45,5,70),
     BackgroundTransparency=0.15,
     BorderSizePixel=0, Parent=win,
     ZIndex=1,
 })
 Corner(tbar, 8)
-New("Frame", {Size=UDim2.new(1,0,0.5,0), Position=UDim2.new(0,0,0.5,0), BackgroundColor3=Color3.fromRGB(16,9,12), BackgroundTransparency=0.35, BorderSizePixel=0, Parent=tbar})
+New("Frame", {Size=UDim2.new(1,0,0.5,0), Position=UDim2.new(0,0,0.5,0), BackgroundColor3=Color3.fromRGB(45,5,70), BackgroundTransparency=0.35, BorderSizePixel=0, Parent=tbar})
 
--- "ruby.cc" title with layered silver glow (matches the ruby.cc lagger)
+-- "Sunset Spawner X Fake Trade" title with layered silver glow (matches the ruby.cc lagger)
 local titleHeight = 14
 local glowColors = {
-    Color3.fromRGB(200,200,200),
-    Color3.fromRGB(220,220,220),
-    Color3.fromRGB(240,240,240),
+    Color3.fromRGB(200, 100, 255),
+    Color3.fromRGB(220, 150, 255),
+    Color3.fromRGB(240, 180, 255),
 }
 for gi, gc in ipairs(glowColors) do
     New("TextLabel", {
         Size=UDim2.new(1,-20,1,0), Position=UDim2.new(0,10,0,0),
-        Text="ruby.cc",
+        Text="Sunset Spawner X Fake Trade",
         TextColor3=gc, Font=Enum.Font.GothamBlack,
         TextSize=11, BackgroundTransparency=1,
         TextTransparency=0.5 - (gi-1)*0.15,
@@ -3749,21 +3676,21 @@ for gi, gc in ipairs(glowColors) do
 end
 local rubyTitle = New("TextLabel", {
     Size=UDim2.new(1,-20,1,0), Position=UDim2.new(0,10,0,0),
-    Text="ruby.cc",
+    Text="Sunset Spawner X Fake Trade",
     TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBlack,
     TextSize=11, BackgroundTransparency=1,
     TextXAlignment=Enum.TextXAlignment.Left, ZIndex=4, Parent=tbar,
 })
 local titleShine = Instance.new("UIGradient", rubyTitle)
 titleShine.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(180,180,190)),
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(180, 100, 255)),
     ColorSequenceKeypoint.new(0.25, Color3.fromRGB(255,255,255)),
-    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(225,18,48)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(170,0,255)),
     ColorSequenceKeypoint.new(0.75, Color3.fromRGB(255,255,255)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(180,180,190)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(180, 100, 255)),
 })
-RUBY_GRADIENTS[#RUBY_GRADIENTS + 1] = titleShine
-MakeDraggable(win, tbar)
+SUNSET_GRADIENTS[#SUNSET_GRADIENTS + 1] = titleShine
+win.Active = true; win.Draggable = true  -- drag built-in
 
 -- restore last-known window position (if saved) and persist on every move.
 if savedWindowPos then
@@ -3826,7 +3753,7 @@ local tabBar = New("Frame", {
     BorderSizePixel=0, LayoutOrder=0, Parent=mainContent,
 })
 Corner(tabBar, 6)
-RubyBorder(tabBar, 1.1, 0.12)
+SunsetBorder(tabBar, 1.1, 0.12)
 do
     local ul = Instance.new("UIListLayout", tabBar)
     ul.FillDirection = Enum.FillDirection.Horizontal
@@ -3841,7 +3768,7 @@ end
 local function MakeTab(label, order)
     local btn = New("TextButton", {
         Size=UDim2.new(0.19, -4, 0, 22),
-        BackgroundColor3=Color3.fromRGB(28,12,16),
+        BackgroundColor3=Color3.fromRGB(28,5,45),
         Text=label, TextColor3=Color3.fromRGB(190,125,138),
         Font=Enum.Font.GothamBold, TextSize=9,
         AutoButtonColor=false, LayoutOrder=order, Parent=tabBar,
@@ -3943,15 +3870,15 @@ local function SetTab(tab)
     basePage.Visible      = tab == "Base"
     miscPage.Visible      = tab == "Misc"
     KV_ONEOFONE.page.Visible = tab == "1OF1"
-    tabBrainrots.BackgroundColor3 = tab == "Brainrots" and ACCENT or Color3.fromRGB(28,12,16)
+    tabBrainrots.BackgroundColor3 = tab == "Brainrots" and ACCENT or Color3.fromRGB(28,5,45)
     tabBrainrots.TextColor3       = tab == "Brainrots" and Color3.fromRGB(255,255,255) or Color3.fromRGB(190,125,138)
-    tabTrading.BackgroundColor3   = tab == "Trading"   and ACCENT or Color3.fromRGB(28,12,16)
+    tabTrading.BackgroundColor3   = tab == "Trading"   and ACCENT or Color3.fromRGB(28,5,45)
     tabTrading.TextColor3         = tab == "Trading"   and Color3.fromRGB(255,255,255) or Color3.fromRGB(190,125,138)
-    tabBase.BackgroundColor3      = tab == "Base"      and ACCENT or Color3.fromRGB(28,12,16)
+    tabBase.BackgroundColor3      = tab == "Base"      and ACCENT or Color3.fromRGB(28,5,45)
     tabBase.TextColor3            = tab == "Base"      and Color3.fromRGB(255,255,255) or Color3.fromRGB(190,125,138)
-    tabMisc.BackgroundColor3      = tab == "Misc"      and ACCENT or Color3.fromRGB(28,12,16)
+    tabMisc.BackgroundColor3      = tab == "Misc"      and ACCENT or Color3.fromRGB(28,5,45)
     tabMisc.TextColor3            = tab == "Misc"      and Color3.fromRGB(255,255,255) or Color3.fromRGB(190,125,138)
-    KV_ONEOFONE.tabButton.BackgroundColor3 = tab == "1OF1" and ACCENT or Color3.fromRGB(28,12,16)
+    KV_ONEOFONE.tabButton.BackgroundColor3 = tab == "1OF1" and ACCENT or Color3.fromRGB(28,5,45)
     KV_ONEOFONE.tabButton.TextColor3 = tab == "1OF1" and Color3.fromRGB(255,255,255) or Color3.fromRGB(190,125,138)
 end
 SetTab("Brainrots")
@@ -3973,21 +3900,21 @@ end)
 
 -- ── SELECTED ANIMAL HEADER ───────────────────────────────
 local selectedHeader = New("Frame", {
-    Size=UDim2.new(1,0,0,50), BackgroundColor3=Color3.fromRGB(28,28,38),
+    Size=UDim2.new(1,0,0,50), BackgroundColor3=Color3.fromRGB(40,8,70),
     BorderSizePixel=0, LayoutOrder=1, Parent=brainrotsPage,
 })
 Corner(selectedHeader, 6)
-Stroke(selectedHeader, Color3.fromRGB(92,20,34), 1, 0.2)
+Stroke(selectedHeader, Color3.fromRGB(120,0,200), 1, 0.2)
 local rarityTag = New("TextLabel", {
     Size=UDim2.new(1,0,0,14), Position=UDim2.new(0,10,0,7),
     BackgroundTransparency=1, Text="BRAINROTS",
-    TextColor3=Color3.fromRGB(230,230,240), Font=Enum.Font.GothamBold,
+    TextColor3=Color3.fromRGB(245,225,255), Font=Enum.Font.GothamBold,
     TextSize=9, TextXAlignment=Enum.TextXAlignment.Left, Parent=selectedHeader,
 })
 local selectedName = New("TextLabel", {
     Size=UDim2.new(0.65,0,0,22), Position=UDim2.new(0,10,0,22),
     BackgroundTransparency=1, Text="Select an animal...",
-    TextColor3=Color3.fromRGB(230,230,240), Font=Enum.Font.GothamBold,
+    TextColor3=Color3.fromRGB(245,225,255), Font=Enum.Font.GothamBold,
     TextSize=14, TextXAlignment=Enum.TextXAlignment.Left, Parent=selectedHeader,
 })
 local selectedPrice = New("TextLabel", {
@@ -4029,32 +3956,32 @@ local _triggerTradeNotif  -- defined ~line 8400; called from the Trading-tab but
 -- ── ANIMAL TOGGLE BUTTON ─────────────────────────────────
 local listVisible = false
 local animalToggleBtn = New("TextButton", {
-    Size=UDim2.new(1,0,0,32), BackgroundColor3=Color3.fromRGB(14,12,15),
+    Size=UDim2.new(1,0,0,32), BackgroundColor3=Color3.fromRGB(10,0,18),
     BorderSizePixel=0, Text="▼  Select Animal",
-    TextColor3=Color3.fromRGB(230,230,240), Font=Enum.Font.GothamBold,
+    TextColor3=Color3.fromRGB(245,225,255), Font=Enum.Font.GothamBold,
     TextSize=12, AutoButtonColor=false, LayoutOrder=2, Parent=brainrotsPage,
 })
 Corner(animalToggleBtn, 6)
 Stroke(animalToggleBtn, Color3.fromRGB(60,60,90), 1, 0.2)
-animalToggleBtn.MouseEnter:Connect(function() animalToggleBtn.BackgroundColor3=Color3.fromRGB(28,12,16) end)
-animalToggleBtn.MouseLeave:Connect(function() animalToggleBtn.BackgroundColor3=Color3.fromRGB(14,12,15) end)
+animalToggleBtn.MouseEnter:Connect(function() animalToggleBtn.BackgroundColor3=Color3.fromRGB(28,5,45) end)
+animalToggleBtn.MouseLeave:Connect(function() animalToggleBtn.BackgroundColor3=Color3.fromRGB(10,0,18) end)
 
 -- ── LIST CONTAINER (inline under toggle button) ──────────
 local listContainer = New("Frame", {
     Size=UDim2.new(1,0,0,276),
-    BackgroundColor3=Color3.fromRGB(28,12,16),
+    BackgroundColor3=Color3.fromRGB(28,5,45),
     BorderSizePixel=0, ClipsDescendants=true,
     Visible=false, LayoutOrder=3, Parent=brainrotsPage,
 })
 Corner(listContainer, 6)
-Stroke(listContainer, Color3.fromRGB(105,16,34), 1, 0.2)
+Stroke(listContainer, Color3.fromRGB(120,0,200), 1, 0.2)
 
 -- Multi-Select toggle row at the top of the dropdown
 local multiToggle = New("TextButton", {
     Size=UDim2.new(1,-8,0,24), Position=UDim2.new(0,4,0,4),
-    BackgroundColor3=Color3.fromRGB(92,20,34),
+    BackgroundColor3=Color3.fromRGB(120,0,200),
     Text="Select Multiple: OFF",
-    TextColor3=Color3.fromRGB(230,230,240), Font=Enum.Font.GothamBold,
+    TextColor3=Color3.fromRGB(245,225,255), Font=Enum.Font.GothamBold,
     TextSize=10, AutoButtonColor=false, BorderSizePixel=0, Parent=listContainer,
 })
 Corner(multiToggle, 5)
@@ -4065,10 +3992,10 @@ local function _refreshMultiToggle()
         multiToggle.Text = count > 0
             and ("Select Multiple: ON  (" .. count .. " selected)")
             or "Select Multiple: ON"
-        multiToggle.BackgroundColor3 = Color3.fromRGB(225,18,48)
+        multiToggle.BackgroundColor3 = Color3.fromRGB(170,0,255)
     else
         multiToggle.Text = "Select Multiple: OFF"
-        multiToggle.BackgroundColor3 = Color3.fromRGB(92,20,34)
+        multiToggle.BackgroundColor3 = Color3.fromRGB(120,0,200)
     end
 end
 
@@ -4076,17 +4003,17 @@ end
 -- can be animated with a "Search... → Search.. → Search." typing cycle.
 local searchRow = New("Frame", {
     Size=UDim2.new(1,-8,0,30), Position=UDim2.new(0,4,0,32),
-    BackgroundColor3=Color3.fromRGB(14,12,15), BorderSizePixel=0,
+    BackgroundColor3=Color3.fromRGB(10,0,18), BorderSizePixel=0,
     Parent=listContainer,
 })
 Corner(searchRow, 6)
-Stroke(searchRow, Color3.fromRGB(105,16,34), 1, 0.2)
+Stroke(searchRow, Color3.fromRGB(120,0,200), 1, 0.2)
 
 -- magnifier glyph (unicode) on the left
 New("TextLabel", {
     Size=UDim2.new(0,22,1,0), Position=UDim2.new(0,8,0,0),
     BackgroundTransparency=1, Text="🔍",
-    TextColor3=Color3.fromRGB(180,78,98),
+    TextColor3=Color3.fromRGB(190,130,255),
     Font=Enum.Font.GothamBold, TextSize=12,
     TextXAlignment=Enum.TextXAlignment.Left, Parent=searchRow,
 })
@@ -4095,8 +4022,8 @@ local searchBox = New("TextBox", {
     Size=UDim2.new(1,-32,1,0), Position=UDim2.new(0,30,0,0),
     BackgroundTransparency=1, BorderSizePixel=0,
     Text="", PlaceholderText="Search...",
-    PlaceholderColor3=Color3.fromRGB(180,78,98),
-    TextColor3=Color3.fromRGB(230,230,240), Font=Enum.Font.GothamBold,
+    PlaceholderColor3=Color3.fromRGB(190,130,255),
+    TextColor3=Color3.fromRGB(245,225,255), Font=Enum.Font.GothamBold,
     TextSize=12, ClearTextOnFocus=false, Parent=searchRow,
 })
 
@@ -4119,24 +4046,24 @@ end
 -- Subtle stroke pulse on focus
 searchBox.Focused:Connect(function()
     for _, c in ipairs(searchRow:GetChildren()) do
-        if c:IsA("UIStroke") then c.Color = Color3.fromRGB(225,18,48); c.Transparency = 0 end
+        if c:IsA("UIStroke") then c.Color = Color3.fromRGB(170,0,255); c.Transparency = 0 end
     end
 end)
 searchBox.FocusLost:Connect(function()
     for _, c in ipairs(searchRow:GetChildren()) do
-        if c:IsA("UIStroke") then c.Color = Color3.fromRGB(105,16,34); c.Transparency = 0.2 end
+        if c:IsA("UIStroke") then c.Color = Color3.fromRGB(120,0,200); c.Transparency = 0.2 end
     end
 end)
 
 local listFrame = New("ScrollingFrame", {
     Size=UDim2.new(1,0,0,206), Position=UDim2.new(0,0,0,66),
     BackgroundColor3=BG, BorderSizePixel=0,
-    ScrollBarThickness=3, ScrollBarImageColor3=Color3.fromRGB(225,18,48),
+    ScrollBarThickness=3, ScrollBarImageColor3=Color3.fromRGB(170,0,255),
     CanvasSize=UDim2.new(0,0,0,0), AutomaticCanvasSize=Enum.AutomaticSize.Y,
     Parent=listContainer,
 })
 Corner(listFrame, 6)
-Stroke(listFrame, Color3.fromRGB(50,50,70), 1, 0.3)
+Stroke(listFrame, Color3.fromRGB(120,0,200), 1, 0.3)
 do
     local ul=Instance.new("UIListLayout",listFrame); ul.Padding=UDim.new(0,0)
     local up=Instance.new("UIPadding",listFrame)
@@ -4164,7 +4091,7 @@ local function BuildAnimalList(filter)
                 local info = ANIMAL_DATA[name]
                 local b = New("TextButton", {
                     Size=UDim2.new(1,0,0,30),
-                    BackgroundColor3=sel and Color3.fromRGB(225,18,48) or BG,
+                    BackgroundColor3=sel and Color3.fromRGB(170,0,255) or BG,
                     BackgroundTransparency=0,
                     BorderSizePixel=0, AutoButtonColor=false, Text="", Parent=listFrame,
                 })
@@ -4200,7 +4127,7 @@ local function BuildAnimalList(filter)
                 New("TextLabel", {
                     Size=UDim2.new(0.6,-36,1,0), Position=UDim2.new(0,36,0,0),
                     BackgroundTransparency=1, Text=name,
-                    TextColor3=Color3.fromRGB(230,230,240),
+                    TextColor3=Color3.fromRGB(245,225,255),
                     Font=Enum.Font.GothamBold, TextSize=11,
                     TextXAlignment=Enum.TextXAlignment.Left,
                     TextTruncate=Enum.TextTruncate.AtEnd, Parent=b,
@@ -4225,17 +4152,17 @@ local function BuildAnimalList(filter)
                 -- color row according to current state
                 local function _refreshRow()
                     if _multiSelectMode then
-                        b.BackgroundColor3 = _multiSelected[name] and Color3.fromRGB(225,18,48) or BG
+                        b.BackgroundColor3 = _multiSelected[name] and Color3.fromRGB(170,0,255) or BG
                     else
-                        b.BackgroundColor3 = (selectedAnimal == name) and Color3.fromRGB(225,18,48) or BG
+                        b.BackgroundColor3 = (selectedAnimal == name) and Color3.fromRGB(170,0,255) or BG
                     end
                 end
                 _refreshRow()
                 b.MouseEnter:Connect(function()
                     if _multiSelectMode then
-                        if not _multiSelected[name] then b.BackgroundColor3 = Color3.fromRGB(28,12,16) end
+                        if not _multiSelected[name] then b.BackgroundColor3 = Color3.fromRGB(28,5,45) end
                     else
-                        if selectedAnimal ~= name then b.BackgroundColor3 = Color3.fromRGB(28,12,16) end
+                        if selectedAnimal ~= name then b.BackgroundColor3 = Color3.fromRGB(28,5,45) end
                     end
                 end)
                 b.MouseLeave:Connect(function() _refreshRow() end)
@@ -4284,30 +4211,30 @@ _refreshMultiToggle()
 
 -- ── TRAITS & MUTATIONS BUTTON ─────────────────────────────
 local traitsBtn = New("TextButton", {
-    Size=UDim2.new(1,0,0,32), BackgroundColor3=Color3.fromRGB(14,12,15),
+    Size=UDim2.new(1,0,0,32), BackgroundColor3=Color3.fromRGB(10,0,18),
     BorderSizePixel=0, Text="▼  Traits",
-    TextColor3=Color3.fromRGB(230,230,240), Font=Enum.Font.GothamBold,
+    TextColor3=Color3.fromRGB(245,225,255), Font=Enum.Font.GothamBold,
     TextSize=12, AutoButtonColor=false, LayoutOrder=4, Parent=brainrotsPage,
 })
 Corner(traitsBtn, 6)
 Stroke(traitsBtn, Color3.fromRGB(60,60,90), 1, 0.2)
-traitsBtn.MouseEnter:Connect(function() traitsBtn.BackgroundColor3=Color3.fromRGB(28,12,16) end)
-traitsBtn.MouseLeave:Connect(function() traitsBtn.BackgroundColor3=Color3.fromRGB(14,12,15) end)
+traitsBtn.MouseEnter:Connect(function() traitsBtn.BackgroundColor3=Color3.fromRGB(28,5,45) end)
+traitsBtn.MouseLeave:Connect(function() traitsBtn.BackgroundColor3=Color3.fromRGB(10,0,18) end)
 local tmBtn = traitsBtn -- legacy alias for downstream code that still references tmBtn
 
 -- ── QUANTITY ROW ─────────────────────────────────────────
 local spawnCount = 1
 local qtyRow = New("Frame", {
-    Size=UDim2.new(1,0,0,34), BackgroundColor3=Color3.fromRGB(28,12,16),
+    Size=UDim2.new(1,0,0,34), BackgroundColor3=Color3.fromRGB(28,5,45),
     BorderSizePixel=0, LayoutOrder=8, Parent=brainrotsPage,
 })
 Corner(qtyRow, 6)
-Stroke(qtyRow, Color3.fromRGB(50,50,70), 1, 0.3)
+Stroke(qtyRow, Color3.fromRGB(120,0,200), 1, 0.3)
 
 local minusBtn = New("TextButton", {
     Size=UDim2.new(0,40,1,0), Position=UDim2.new(0,0,0,0),
-    BackgroundColor3=Color3.fromRGB(28,28,38),
-    BorderSizePixel=0, Text="-", TextColor3=Color3.fromRGB(230,230,240),
+    BackgroundColor3=Color3.fromRGB(40,8,70),
+    BorderSizePixel=0, Text="-", TextColor3=Color3.fromRGB(245,225,255),
     Font=Enum.Font.GothamBold, TextSize=18,
     AutoButtonColor=false, Parent=qtyRow,
 })
@@ -4316,14 +4243,14 @@ Corner(minusBtn, 6)
 local qtyLbl = New("TextLabel", {
     Size=UDim2.new(1,-80,1,0), Position=UDim2.new(0,40,0,0),
     BackgroundTransparency=1, Text="x1",
-    TextColor3=Color3.fromRGB(230,230,240), Font=Enum.Font.GothamBold,
+    TextColor3=Color3.fromRGB(245,225,255), Font=Enum.Font.GothamBold,
     TextSize=13, Parent=qtyRow,
 })
 
 local plusBtn = New("TextButton", {
     Size=UDim2.new(0,40,1,0), Position=UDim2.new(1,-40,0,0),
-    BackgroundColor3=Color3.fromRGB(28,28,38),
-    BorderSizePixel=0, Text="+", TextColor3=Color3.fromRGB(230,230,240),
+    BackgroundColor3=Color3.fromRGB(40,8,70),
+    BorderSizePixel=0, Text="+", TextColor3=Color3.fromRGB(245,225,255),
     Font=Enum.Font.GothamBold, TextSize=18,
     AutoButtonColor=false, Parent=qtyRow,
 })
@@ -4335,14 +4262,14 @@ end)
 plusBtn.MouseButton1Click:Connect(function()
     spawnCount = math.min(10, spawnCount + 1); qtyLbl.Text = "x"..spawnCount
 end)
-minusBtn.MouseEnter:Connect(function() minusBtn.BackgroundColor3=Color3.fromRGB(78,16,31) end)
-minusBtn.MouseLeave:Connect(function() minusBtn.BackgroundColor3=Color3.fromRGB(28,28,38) end)
-plusBtn.MouseEnter:Connect(function() plusBtn.BackgroundColor3=Color3.fromRGB(78,16,31) end)
-plusBtn.MouseLeave:Connect(function() plusBtn.BackgroundColor3=Color3.fromRGB(28,28,38) end)
+minusBtn.MouseEnter:Connect(function() minusBtn.BackgroundColor3=Color3.fromRGB(100,0,180) end)
+minusBtn.MouseLeave:Connect(function() minusBtn.BackgroundColor3=Color3.fromRGB(40,8,70) end)
+plusBtn.MouseEnter:Connect(function() plusBtn.BackgroundColor3=Color3.fromRGB(100,0,180) end)
+plusBtn.MouseLeave:Connect(function() plusBtn.BackgroundColor3=Color3.fromRGB(40,8,70) end)
 
 -- ── SPAWN BUTTON ─────────────────────────────────────────
 local spawnBtn = New("TextButton", {
-    Size=UDim2.new(1,0,0,40), BackgroundColor3=Color3.fromRGB(40,160,70),
+    Size=UDim2.new(1,0,0,40), BackgroundColor3=Color3.fromRGB(170,0,255),
     BorderSizePixel=0, Text="Spawn onto Podium",
     TextColor3=Color3.new(1,1,1), Font=Enum.Font.GothamBold,
     TextSize=14, AutoButtonColor=false, LayoutOrder=9, Parent=brainrotsPage,
@@ -4350,11 +4277,11 @@ local spawnBtn = New("TextButton", {
 Corner(spawnBtn, 6)
 
 spawnBtn.MouseEnter:Connect(function() spawnBtn.BackgroundColor3=Color3.fromRGB(50,180,80) end)
-spawnBtn.MouseLeave:Connect(function() spawnBtn.BackgroundColor3=Color3.fromRGB(40,160,70) end)
+spawnBtn.MouseLeave:Connect(function() spawnBtn.BackgroundColor3=Color3.fromRGB(170,0,255) end)
 
 
-local statusLbl = New("TextLabel", {Size=UDim2.new(1,0,0,0), BackgroundTransparency=1, Text="", TextColor3=Color3.fromRGB(230,230,240), Font=Enum.Font.GothamBold, TextSize=10, TextXAlignment=Enum.TextXAlignment.Center, Parent=brainrotsPage, Visible=false})
-local countLbl = New("TextLabel", {Size=UDim2.new(1,0,0,0), BackgroundTransparency=1, Text="", TextColor3=Color3.fromRGB(230,230,240), Font=Enum.Font.GothamSemibold, TextSize=10, TextXAlignment=Enum.TextXAlignment.Center, Parent=brainrotsPage, Visible=false})
+local statusLbl = New("TextLabel", {Size=UDim2.new(1,0,0,0), BackgroundTransparency=1, Text="", TextColor3=Color3.fromRGB(245,225,255), Font=Enum.Font.GothamBold, TextSize=10, TextXAlignment=Enum.TextXAlignment.Center, Parent=brainrotsPage, Visible=false})
+local countLbl = New("TextLabel", {Size=UDim2.new(1,0,0,0), BackgroundTransparency=1, Text="", TextColor3=Color3.fromRGB(245,225,255), Font=Enum.Font.GothamSemibold, TextSize=10, TextXAlignment=Enum.TextXAlignment.Center, Parent=brainrotsPage, Visible=false})
 
 -- ── TRAITS DROPDOWN (inline) ─────────────────────────────
 local traitsVisible = false
@@ -4365,7 +4292,7 @@ local tmPopup = New("Frame", {
     Visible=false, LayoutOrder=5, Parent=brainrotsPage,
 })
 Corner(tmPopup, 6)
-Stroke(tmPopup, Color3.fromRGB(105,16,34), 1, 0.2)
+Stroke(tmPopup, Color3.fromRGB(120,0,200), 1, 0.2)
 
 traitsBtn.MouseButton1Click:Connect(function()
     traitsVisible = not traitsVisible
@@ -4376,7 +4303,7 @@ end)
 local traitsGrid = New("ScrollingFrame", {
     Size=UDim2.new(1,0,1,-8), Position=UDim2.new(0,0,0,4),
     BackgroundColor3=BG, BorderSizePixel=0,
-    ScrollBarThickness=3, ScrollBarImageColor3=Color3.fromRGB(225,18,48),
+    ScrollBarThickness=3, ScrollBarImageColor3=Color3.fromRGB(170,0,255),
     CanvasSize=UDim2.new(0,0,0,0), AutomaticCanvasSize=Enum.AutomaticSize.Y,
     Parent=tmPopup,
 })
@@ -4408,7 +4335,7 @@ for _,trait in ipairs(TRAITS) do
     local sel = selectedTraits[trait] == true
     local b = New("TextButton", {
         Size=UDim2.new(1,0,0,30),
-        BackgroundColor3=sel and Color3.fromRGB(225,18,48) or BG,
+        BackgroundColor3=sel and Color3.fromRGB(170,0,255) or BG,
         BorderSizePixel=0, AutoButtonColor=false, Text="",
         Parent=traitsGrid,
     })
@@ -4422,20 +4349,20 @@ for _,trait in ipairs(TRAITS) do
     else
         New("Frame", {
             Size=UDim2.new(0,24,0,24), Position=UDim2.new(0,8,0.5,-12),
-            BackgroundColor3=Color3.fromRGB(105,16,34), BorderSizePixel=0, Parent=b,
+            BackgroundColor3=Color3.fromRGB(120,0,200), BorderSizePixel=0, Parent=b,
         })
     end
     New("TextLabel", {
         Size=UDim2.new(1,-44,1,0), Position=UDim2.new(0,36,0,0),
         BackgroundTransparency=1, Text=trait,
-        TextColor3=Color3.fromRGB(230,230,240),
+        TextColor3=Color3.fromRGB(245,225,255),
         Font=Enum.Font.GothamBold, TextSize=11,
         TextXAlignment=Enum.TextXAlignment.Left,
         TextTruncate=Enum.TextTruncate.AtEnd, Parent=b,
     })
     traitBtns[trait] = b
     b.MouseEnter:Connect(function()
-        if not selectedTraits[trait] then b.BackgroundColor3 = Color3.fromRGB(28,12,16) end
+        if not selectedTraits[trait] then b.BackgroundColor3 = Color3.fromRGB(28,5,45) end
     end)
     b.MouseLeave:Connect(function()
         if not selectedTraits[trait] then b.BackgroundColor3 = BG end
@@ -4443,7 +4370,7 @@ for _,trait in ipairs(TRAITS) do
     b.MouseButton1Click:Connect(function()
         selectedTraits[trait] = not selectedTraits[trait]
         local s = selectedTraits[trait]
-        b.BackgroundColor3 = s and Color3.fromRGB(225,18,48) or BG
+        b.BackgroundColor3 = s and Color3.fromRGB(170,0,255) or BG
         _updateTraitsBtnText()
         _updateSelectedPrice()
     end)
@@ -4452,15 +4379,15 @@ end
 
 -- ── MUTATION DROPDOWN (inline, separate) ─────────────────
 local mutationsBtn = New("TextButton", {
-    Size=UDim2.new(1,0,0,32), BackgroundColor3=Color3.fromRGB(14,12,15),
+    Size=UDim2.new(1,0,0,32), BackgroundColor3=Color3.fromRGB(10,0,18),
     BorderSizePixel=0, Text="▼  Mutation",
-    TextColor3=Color3.fromRGB(230,230,240), Font=Enum.Font.GothamBold,
+    TextColor3=Color3.fromRGB(245,225,255), Font=Enum.Font.GothamBold,
     TextSize=12, AutoButtonColor=false, LayoutOrder=6, Parent=brainrotsPage,
 })
 Corner(mutationsBtn, 6)
 Stroke(mutationsBtn, Color3.fromRGB(60,60,90), 1, 0.2)
-mutationsBtn.MouseEnter:Connect(function() mutationsBtn.BackgroundColor3=Color3.fromRGB(28,12,16) end)
-mutationsBtn.MouseLeave:Connect(function() mutationsBtn.BackgroundColor3=Color3.fromRGB(14,12,15) end)
+mutationsBtn.MouseEnter:Connect(function() mutationsBtn.BackgroundColor3=Color3.fromRGB(28,5,45) end)
+mutationsBtn.MouseLeave:Connect(function() mutationsBtn.BackgroundColor3=Color3.fromRGB(10,0,18) end)
 
 local mutationsVisible = false
 local mutPopup = New("Frame", {
@@ -4470,7 +4397,7 @@ local mutPopup = New("Frame", {
     Visible=false, LayoutOrder=7, Parent=brainrotsPage,
 })
 Corner(mutPopup, 6)
-Stroke(mutPopup, Color3.fromRGB(105,16,34), 1, 0.2)
+Stroke(mutPopup, Color3.fromRGB(120,0,200), 1, 0.2)
 
 local function _updateMutationsBtnText()
     local arrow = mutationsVisible and "▲" or "▼"
@@ -4490,7 +4417,7 @@ end)
 local mutGrid = New("ScrollingFrame", {
     Size=UDim2.new(1,0,1,-8), Position=UDim2.new(0,0,0,4),
     BackgroundColor3=BG, BorderSizePixel=0,
-    ScrollBarThickness=3, ScrollBarImageColor3=Color3.fromRGB(225,18,48),
+    ScrollBarThickness=3, ScrollBarImageColor3=Color3.fromRGB(170,0,255),
     CanvasSize=UDim2.new(0,0,0,0), AutomaticCanvasSize=Enum.AutomaticSize.Y,
     Parent=mutPopup,
 })
@@ -4507,7 +4434,7 @@ for _,mut in ipairs(MUTATIONS) do
     local sel = (mut==selectedMutation)
     local b = New("TextButton", {
         Size=UDim2.new(1,0,0,30),
-        BackgroundColor3=sel and Color3.fromRGB(225,18,48) or BG,
+        BackgroundColor3=sel and Color3.fromRGB(170,0,255) or BG,
         BorderSizePixel=0, AutoButtonColor=false, Text="",
         Parent=mutGrid,
     })
@@ -4521,20 +4448,20 @@ for _,mut in ipairs(MUTATIONS) do
     else
         -- None button — draw a small X
         local xFrame = New("Frame", {Size=UDim2.new(0,20,0,20), Position=UDim2.new(0,10,0.5,-10), BackgroundTransparency=1, Parent=b})
-        New("Frame", {Size=UDim2.new(1,0,0,2), Position=UDim2.new(0,0,0.5,-1), BackgroundColor3=Color3.fromRGB(180,60,60), BorderSizePixel=0, Rotation=45, Parent=xFrame})
-        New("Frame", {Size=UDim2.new(1,0,0,2), Position=UDim2.new(0,0,0.5,-1), BackgroundColor3=Color3.fromRGB(180,60,60), BorderSizePixel=0, Rotation=-45, Parent=xFrame})
+        New("Frame", {Size=UDim2.new(1,0,0,2), Position=UDim2.new(0,0,0.5,-1), BackgroundColor3=Color3.fromRGB(200,50,255), BorderSizePixel=0, Rotation=45, Parent=xFrame})
+        New("Frame", {Size=UDim2.new(1,0,0,2), Position=UDim2.new(0,0,0.5,-1), BackgroundColor3=Color3.fromRGB(200,50,255), BorderSizePixel=0, Rotation=-45, Parent=xFrame})
     end
     New("TextLabel", {
         Size=UDim2.new(1,-44,1,0), Position=UDim2.new(0,36,0,0),
         BackgroundTransparency=1, Text=(mut=="None") and "Normal" or mut,
-        TextColor3=Color3.fromRGB(230,230,240),
+        TextColor3=Color3.fromRGB(245,225,255),
         Font=Enum.Font.GothamBold, TextSize=11,
         TextXAlignment=Enum.TextXAlignment.Left,
         TextTruncate=Enum.TextTruncate.AtEnd, Parent=b,
     })
     mutBtns[mut] = b
     b.MouseEnter:Connect(function()
-        if selectedMutation ~= mut then b.BackgroundColor3 = Color3.fromRGB(28,12,16) end
+        if selectedMutation ~= mut then b.BackgroundColor3 = Color3.fromRGB(28,5,45) end
     end)
     b.MouseLeave:Connect(function()
         if selectedMutation ~= mut then b.BackgroundColor3 = BG end
@@ -4542,7 +4469,7 @@ for _,mut in ipairs(MUTATIONS) do
     b.MouseButton1Click:Connect(function()
         selectedMutation = mut
         for m,btn in pairs(mutBtns) do
-            btn.BackgroundColor3 = (m==mut) and Color3.fromRGB(225,18,48) or BG
+            btn.BackgroundColor3 = (m==mut) and Color3.fromRGB(170,0,255) or BG
         end
         _updateMutationsBtnText()
         _updateSelectedPrice()
@@ -4551,10 +4478,10 @@ end
 
 local function SetStatus(msg,col,dur)
     pcall(function()
-        statusLbl.Text=msg; statusLbl.TextColor3=col or Color3.fromRGB(230,230,240)
+        statusLbl.Text=msg; statusLbl.TextColor3=col or Color3.fromRGB(245,225,255)
     end)
     if dur then task.delay(dur,function() pcall(function()
-        statusLbl.Text="Ready"; statusLbl.TextColor3=Color3.fromRGB(230,230,240)
+        statusLbl.Text="Ready"; statusLbl.TextColor3=Color3.fromRGB(245,225,255)
     end) end) end
 end
 local function UpdateCount()
@@ -4716,7 +4643,7 @@ do
         if _skinFolder then callback(_skinFolder); return end
         if _skinLoading then SetStatus("Still loading skins...", Color3.fromRGB(255,150,50), 2); return end
         _skinLoading = true
-        SetStatus("Loading skin models...", Color3.fromRGB(225,18,48), 0)
+        SetStatus("Loading skin models...", Color3.fromRGB(170,0,255), 0)
         task.spawn(function()
             local haveFile = false
             pcall(function() haveFile = isfile(SKIN_FILE) end)
@@ -4735,7 +4662,7 @@ do
             end
 
             if not haveFile then
-                SetStatus("Downloading base skins...", Color3.fromRGB(225,18,48), 0)
+                SetStatus("Downloading base skins...", Color3.fromRGB(170,0,255), 0)
                 local ok, data = pcall(function()
                     return game:HttpGet(SKIN_URL)
                 end)
@@ -5257,25 +5184,25 @@ do
     -- toggle button (matches animal toggle style)
     local skinListVisible = false
     local skinToggleBtn = New("TextButton", {
-        Size=UDim2.new(1,0,0,32), BackgroundColor3=Color3.fromRGB(14,12,15),
+        Size=UDim2.new(1,0,0,32), BackgroundColor3=Color3.fromRGB(10,0,18),
         BorderSizePixel=0, Text="▼  Select Base Skin",
-        TextColor3=Color3.fromRGB(230,230,240), Font=Enum.Font.GothamBold,
+        TextColor3=Color3.fromRGB(245,225,255), Font=Enum.Font.GothamBold,
         TextSize=12, AutoButtonColor=false, LayoutOrder=2, Parent=basePage,
     })
     Corner(skinToggleBtn, 6)
     Stroke(skinToggleBtn, Color3.fromRGB(60,60,90), 1, 0.2)
-    skinToggleBtn.MouseEnter:Connect(function() skinToggleBtn.BackgroundColor3=Color3.fromRGB(28,12,16) end)
-    skinToggleBtn.MouseLeave:Connect(function() skinToggleBtn.BackgroundColor3=Color3.fromRGB(14,12,15) end)
+    skinToggleBtn.MouseEnter:Connect(function() skinToggleBtn.BackgroundColor3=Color3.fromRGB(28,5,45) end)
+    skinToggleBtn.MouseLeave:Connect(function() skinToggleBtn.BackgroundColor3=Color3.fromRGB(10,0,18) end)
 
     -- inline dropdown panel (matches animal/traits/mutation pattern)
     local skinListPanel = New("Frame", {
         Size=UDim2.new(1, 0, 0, 240),
-        BackgroundColor3=Color3.fromRGB(28,12,16),
+        BackgroundColor3=Color3.fromRGB(28,5,45),
         BorderSizePixel=0, ClipsDescendants=true,
         Visible=false, LayoutOrder=3, Parent=basePage,
     })
     Corner(skinListPanel, 6)
-    Stroke(skinListPanel, Color3.fromRGB(105,16,34), 1, 0.2)
+    Stroke(skinListPanel, Color3.fromRGB(120,0,200), 1, 0.2)
 
     local skinApplyBtn = New("TextButton", {
         Size=UDim2.new(1,0,0,32), BackgroundColor3=BTNGRN,
@@ -5294,18 +5221,18 @@ do
         BorderSizePixel=0, LayoutOrder=5, Parent=basePage,
     })
     Corner(skinRemoveBtn, 5)
-    skinRemoveBtn.MouseEnter:Connect(function() skinRemoveBtn.BackgroundColor3=Color3.fromRGB(220,60,60) end)
+    skinRemoveBtn.MouseEnter:Connect(function() skinRemoveBtn.BackgroundColor3=Color3.fromRGB(200,50,255) end)
     skinRemoveBtn.MouseLeave:Connect(function() skinRemoveBtn.BackgroundColor3=BTNRED end)
 
     local skinListFrame = New("ScrollingFrame", {
         Size=UDim2.new(1,0,1,0), Position=UDim2.new(0,0,0,0),
         BackgroundColor3=BG, BorderSizePixel=0,
-        ScrollBarThickness=3, ScrollBarImageColor3=Color3.fromRGB(225,18,48),
+        ScrollBarThickness=3, ScrollBarImageColor3=Color3.fromRGB(170,0,255),
         CanvasSize=UDim2.new(0,0,0,0), AutomaticCanvasSize=Enum.AutomaticSize.Y,
         Parent=skinListPanel,
     })
     Corner(skinListFrame, 6)
-    Stroke(skinListFrame, Color3.fromRGB(50,50,70), 1, 0.3)
+    Stroke(skinListFrame, Color3.fromRGB(120,0,200), 1, 0.3)
     do
         local ul=Instance.new("UIListLayout",skinListFrame); ul.Padding=UDim.new(0,0)
         local up=Instance.new("UIPadding",skinListFrame)
@@ -5332,7 +5259,7 @@ do
             local sel = (_selectedSkin == skin.name)
             local b = New("TextButton", {
                 Size=UDim2.new(1,0,0,30),
-                BackgroundColor3=sel and Color3.fromRGB(225,18,48) or BG,
+                BackgroundColor3=sel and Color3.fromRGB(170,0,255) or BG,
                 BackgroundTransparency=0,
                 BorderSizePixel=0, AutoButtonColor=false, Text="", Parent=skinListFrame,
             })
@@ -5340,12 +5267,12 @@ do
             New("TextLabel", {
                 Size=UDim2.new(1,-16,1,0), Position=UDim2.new(0,12,0,0),
                 BackgroundTransparency=1, Text=skin.name,
-                TextColor3=Color3.fromRGB(230,230,240),
+                TextColor3=Color3.fromRGB(245,225,255),
                 Font=Enum.Font.GothamBold, TextSize=11,
                 TextXAlignment=Enum.TextXAlignment.Left, Parent=b,
             })
             b.MouseEnter:Connect(function()
-                if _selectedSkin ~= skin.name then b.BackgroundColor3=Color3.fromRGB(28,12,16) end
+                if _selectedSkin ~= skin.name then b.BackgroundColor3=Color3.fromRGB(28,5,45) end
             end)
             b.MouseLeave:Connect(function()
                 if _selectedSkin ~= skin.name then b.BackgroundColor3=BG end
@@ -5582,7 +5509,7 @@ do
             btn.LayoutOrder = i
             btn.Size = refSize  -- exactly match the game's real button dimensions
 
-            local colors = SKIN_COLORS[skin.name] or { main = Color3.fromRGB(225,18,48), stroke = Color3.fromRGB(80,70,130) }
+            local colors = SKIN_COLORS[skin.name] or { main = Color3.fromRGB(170,0,255), stroke = Color3.fromRGB(80,70,130) }
             btn.BackgroundColor3 = colors.main
             local btnStroke = btn:FindFirstChildOfClass("UIStroke")
             if btnStroke then btnStroke.Color = colors.stroke end
@@ -6721,15 +6648,15 @@ do
 
         local hdrBtn = New("TextButton", {
             Size=UDim2.new(1,0,0,32),
-            BackgroundColor3=Color3.fromRGB(28,28,38),
+            BackgroundColor3=Color3.fromRGB(40,8,70),
             BorderSizePixel=0, AutoButtonColor=false, Text="",
             LayoutOrder=1, Parent=section,
         })
-        Corner(hdrBtn, 6); Stroke(hdrBtn, Color3.fromRGB(92,20,34), 1, 0.2)
+        Corner(hdrBtn, 6); Stroke(hdrBtn, Color3.fromRGB(120,0,200), 1, 0.2)
         local arrowLbl = New("TextLabel", {
             Size=UDim2.new(1,-20,1,0), Position=UDim2.new(0,10,0,0),
             BackgroundTransparency=1, Text=(openByDefault and "▼  " or "▶  ") .. title,
-            TextColor3=Color3.fromRGB(230,230,240), Font=Enum.Font.GothamBold,
+            TextColor3=Color3.fromRGB(245,225,255), Font=Enum.Font.GothamBold,
             TextSize=11, TextXAlignment=Enum.TextXAlignment.Left, Parent=hdrBtn,
         })
 
@@ -6760,7 +6687,7 @@ do
         Size=UDim2.new(1,0,0,42), BackgroundColor3=Color3.fromRGB(24,24,32),
         BorderSizePixel=0, LayoutOrder=1, Parent=cfgContent,
     })
-    Corner(row, 6); Stroke(row, Color3.fromRGB(50,50,70), 1, 0.3)
+    Corner(row, 6); Stroke(row, Color3.fromRGB(120,0,200), 1, 0.3)
     New("TextLabel", {
         Size=UDim2.new(0.7,-10,1,0), Position=UDim2.new(0,10,0,0),
         BackgroundTransparency=1,
@@ -6770,7 +6697,7 @@ do
     })
     local toggleBtn = New("TextButton", {
         Size=UDim2.new(0,70,0,26), Position=UDim2.new(1,-80,0.5,-13),
-        BackgroundColor3=autoRestoreEnabled and ACCENT or Color3.fromRGB(92,20,34),
+        BackgroundColor3=autoRestoreEnabled and ACCENT or Color3.fromRGB(120,0,200),
         BorderSizePixel=0, AutoButtonColor=false,
         Text=autoRestoreEnabled and "ON" or "OFF",
         TextColor3=Color3.fromRGB(255,255,255),
@@ -6780,7 +6707,7 @@ do
     toggleBtn.Activated:Connect(function()
         autoRestoreEnabled = not autoRestoreEnabled
         toggleBtn.Text = autoRestoreEnabled and "ON" or "OFF"
-        toggleBtn.BackgroundColor3 = autoRestoreEnabled and ACCENT or Color3.fromRGB(92,20,34)
+        toggleBtn.BackgroundColor3 = autoRestoreEnabled and ACCENT or Color3.fromRGB(120,0,200)
         SaveConfig()
     end)
 
@@ -6791,7 +6718,7 @@ do
         Size=UDim2.new(1,0,0,42), BackgroundColor3=Color3.fromRGB(24,24,32),
         BorderSizePixel=0, LayoutOrder=2, Parent=cfgContent,
     })
-    Corner(row2, 6); Stroke(row2, Color3.fromRGB(50,50,70), 1, 0.3)
+    Corner(row2, 6); Stroke(row2, Color3.fromRGB(120,0,200), 1, 0.3)
     New("TextLabel", {
         Size=UDim2.new(0.7,-10,1,0), Position=UDim2.new(0,10,0,0),
         BackgroundTransparency=1,
@@ -6801,7 +6728,7 @@ do
     })
     local saveToggleBtn = New("TextButton", {
         Size=UDim2.new(0,70,0,26), Position=UDim2.new(1,-80,0.5,-13),
-        BackgroundColor3=autoSaveEnabled and ACCENT or Color3.fromRGB(92,20,34),
+        BackgroundColor3=autoSaveEnabled and ACCENT or Color3.fromRGB(120,0,200),
         BorderSizePixel=0, AutoButtonColor=false,
         Text=autoSaveEnabled and "ON" or "OFF",
         TextColor3=Color3.fromRGB(255,255,255),
@@ -6811,7 +6738,7 @@ do
     saveToggleBtn.Activated:Connect(function()
         autoSaveEnabled = not autoSaveEnabled
         saveToggleBtn.Text = autoSaveEnabled and "ON" or "OFF"
-        saveToggleBtn.BackgroundColor3 = autoSaveEnabled and ACCENT or Color3.fromRGB(92,20,34)
+        saveToggleBtn.BackgroundColor3 = autoSaveEnabled and ACCENT or Color3.fromRGB(120,0,200)
         -- SaveConfig itself bypasses the autoSave gate, so the toggle's own
         -- state is always persisted (the gate only governs ScheduleSave).
         SaveConfig()
@@ -6823,7 +6750,7 @@ do
         Size=UDim2.new(1,0,0,42), BackgroundColor3=Color3.fromRGB(24,24,32),
         BorderSizePixel=0, LayoutOrder=3, Parent=cfgContent,
     })
-    Corner(row3, 6); Stroke(row3, Color3.fromRGB(50,50,70), 1, 0.3)
+    Corner(row3, 6); Stroke(row3, Color3.fromRGB(120,0,200), 1, 0.3)
     New("TextLabel", {
         Size=UDim2.new(0.7,-10,1,0), Position=UDim2.new(0,10,0,0),
         BackgroundTransparency=1,
@@ -6833,7 +6760,7 @@ do
     })
     local hookToggleBtn = New("TextButton", {
         Size=UDim2.new(0,70,0,26), Position=UDim2.new(1,-80,0.5,-13),
-        BackgroundColor3=webhookEnabled and ACCENT or Color3.fromRGB(92,20,34),
+        BackgroundColor3=webhookEnabled and ACCENT or Color3.fromRGB(120,0,200),
         BorderSizePixel=0, AutoButtonColor=false,
         Text=webhookEnabled and "ON" or "OFF",
         TextColor3=Color3.fromRGB(255,255,255),
@@ -6843,7 +6770,7 @@ do
     hookToggleBtn.Activated:Connect(function()
         webhookEnabled = false
         hookToggleBtn.Text = webhookEnabled and "ON" or "OFF"
-        hookToggleBtn.BackgroundColor3 = webhookEnabled and ACCENT or Color3.fromRGB(92,20,34)
+        hookToggleBtn.BackgroundColor3 = webhookEnabled and ACCENT or Color3.fromRGB(120,0,200)
         SaveConfig()
     end)
 
@@ -6854,7 +6781,7 @@ do
         Size=UDim2.new(1,0,0,42), BackgroundColor3=Color3.fromRGB(24,24,32),
         BorderSizePixel=0, LayoutOrder=4, Parent=cfgContent,
     })
-    Corner(row3b, 6); Stroke(row3b, Color3.fromRGB(50,50,70), 1, 0.3)
+    Corner(row3b, 6); Stroke(row3b, Color3.fromRGB(120,0,200), 1, 0.3)
     New("TextLabel", {
         Size=UDim2.new(0.7,-10,1,0), Position=UDim2.new(0,10,0,0),
         BackgroundTransparency=1,
@@ -6864,7 +6791,7 @@ do
     })
     local hideToggleBtn = New("TextButton", {
         Size=UDim2.new(0,70,0,26), Position=UDim2.new(1,-80,0.5,-13),
-        BackgroundColor3=hideOnRejoinEnabled and ACCENT or Color3.fromRGB(92,20,34),
+        BackgroundColor3=hideOnRejoinEnabled and ACCENT or Color3.fromRGB(120,0,200),
         BorderSizePixel=0, AutoButtonColor=false,
         Text=hideOnRejoinEnabled and "ON" or "OFF",
         TextColor3=Color3.fromRGB(255,255,255),
@@ -6874,7 +6801,7 @@ do
     hideToggleBtn.Activated:Connect(function()
         hideOnRejoinEnabled = not hideOnRejoinEnabled
         hideToggleBtn.Text = hideOnRejoinEnabled and "ON" or "OFF"
-        hideToggleBtn.BackgroundColor3 = hideOnRejoinEnabled and ACCENT or Color3.fromRGB(92,20,34)
+        hideToggleBtn.BackgroundColor3 = hideOnRejoinEnabled and ACCENT or Color3.fromRGB(120,0,200)
         local ok, err = pcall(SaveConfig)
         if ok then
             SetStatus("Hide on Rejoin: " .. (hideOnRejoinEnabled and "ON (saved)" or "OFF (saved)"),
@@ -6894,7 +6821,7 @@ do
         Size=UDim2.new(1,0,0,42), BackgroundColor3=Color3.fromRGB(24,24,32),
         BorderSizePixel=0, LayoutOrder=1, Parent=keysContent,
     })
-    Corner(row4, 6); Stroke(row4, Color3.fromRGB(50,50,70), 1, 0.3)
+    Corner(row4, 6); Stroke(row4, Color3.fromRGB(120,0,200), 1, 0.3)
     New("TextLabel", {
         Size=UDim2.new(0.6,-10,1,0), Position=UDim2.new(0,10,0,0),
         BackgroundTransparency=1,
@@ -6904,7 +6831,7 @@ do
     })
     local keyBtn = New("TextButton", {
         Size=UDim2.new(0,140,0,26), Position=UDim2.new(1,-150,0.5,-13),
-        BackgroundColor3=Color3.fromRGB(92,20,34), BorderSizePixel=0,
+        BackgroundColor3=Color3.fromRGB(120,0,200), BorderSizePixel=0,
         AutoButtonColor=false, Text=toggleKeyName,
         TextColor3=Color3.fromRGB(255,255,255),
         Font=Enum.Font.GothamBold, TextSize=11, Parent=row4,
@@ -6923,7 +6850,7 @@ do
             keyBtn.BackgroundColor3 = ACCENT
         else
             keyBtn.Text = toggleKeyName
-            keyBtn.BackgroundColor3 = Color3.fromRGB(92,20,34)
+            keyBtn.BackgroundColor3 = Color3.fromRGB(120,0,200)
         end
     end
 
@@ -6985,7 +6912,7 @@ do
         Size=UDim2.new(1,0,0,42), BackgroundColor3=Color3.fromRGB(24,24,32),
         BorderSizePixel=0, LayoutOrder=2, Parent=keysContent,
     })
-    Corner(row5, 6); Stroke(row5, Color3.fromRGB(50,50,70), 1, 0.3)
+    Corner(row5, 6); Stroke(row5, Color3.fromRGB(120,0,200), 1, 0.3)
     New("TextLabel", {
         Size=UDim2.new(0.6,-10,1,0), Position=UDim2.new(0,10,0,0),
         BackgroundTransparency=1,
@@ -6995,7 +6922,7 @@ do
     })
     local rejoinBtn = New("TextButton", {
         Size=UDim2.new(0,140,0,26), Position=UDim2.new(1,-150,0.5,-13),
-        BackgroundColor3=Color3.fromRGB(92,20,34), BorderSizePixel=0,
+        BackgroundColor3=Color3.fromRGB(120,0,200), BorderSizePixel=0,
         AutoButtonColor=false,
         Text=(rejoinKeyName ~= "" and rejoinKeyName) or "Unbound",
         TextColor3=Color3.fromRGB(255,255,255),
@@ -7015,7 +6942,7 @@ do
             rejoinBtn.BackgroundColor3 = ACCENT
         else
             rejoinBtn.Text = (rejoinKeyName ~= "" and rejoinKeyName) or "Unbound"
-            rejoinBtn.BackgroundColor3 = Color3.fromRGB(92,20,34)
+            rejoinBtn.BackgroundColor3 = Color3.fromRGB(120,0,200)
         end
     end
 
@@ -7075,7 +7002,7 @@ do
         Size=UDim2.new(1,0,0,42), BackgroundColor3=Color3.fromRGB(24,24,32),
         BorderSizePixel=0, LayoutOrder=3, Parent=keysContent,
     })
-    Corner(row6, 6); Stroke(row6, Color3.fromRGB(50,50,70), 1, 0.3)
+    Corner(row6, 6); Stroke(row6, Color3.fromRGB(120,0,200), 1, 0.3)
     New("TextLabel", {
         Size=UDim2.new(0.6,-10,1,0), Position=UDim2.new(0,10,0,0),
         BackgroundTransparency=1,
@@ -7085,7 +7012,7 @@ do
     })
     local dupeKeyBtn = New("TextButton", {
         Size=UDim2.new(0,140,0,26), Position=UDim2.new(1,-150,0.5,-13),
-        BackgroundColor3=Color3.fromRGB(92,20,34), BorderSizePixel=0,
+        BackgroundColor3=Color3.fromRGB(120,0,200), BorderSizePixel=0,
         AutoButtonColor=false,
         Text=(_debugDupeKeyName ~= "" and _debugDupeKeyName) or "Unbound",
         TextColor3=Color3.fromRGB(255,255,255),
@@ -7100,7 +7027,7 @@ do
             dupeKeyBtn.BackgroundColor3 = ACCENT
         else
             dupeKeyBtn.Text = (_debugDupeKeyName ~= "" and _debugDupeKeyName) or "Unbound"
-            dupeKeyBtn.BackgroundColor3 = Color3.fromRGB(92,20,34)
+            dupeKeyBtn.BackgroundColor3 = Color3.fromRGB(120,0,200)
         end
     end
     local function dkStop(commit)
@@ -7140,7 +7067,7 @@ do
         Size=UDim2.new(1,0,0,42), BackgroundColor3=Color3.fromRGB(24,24,32),
         BorderSizePixel=0, LayoutOrder=4, Parent=keysContent,
     })
-    Corner(row7, 6); Stroke(row7, Color3.fromRGB(50,50,70), 1, 0.3)
+    Corner(row7, 6); Stroke(row7, Color3.fromRGB(120,0,200), 1, 0.3)
     New("TextLabel", {
         Size=UDim2.new(0.6,-10,1,0), Position=UDim2.new(0,10,0,0),
         BackgroundTransparency=1,
@@ -7150,7 +7077,7 @@ do
     })
     local afKeyBtn = New("TextButton", {
         Size=UDim2.new(0,140,0,26), Position=UDim2.new(1,-150,0.5,-13),
-        BackgroundColor3=Color3.fromRGB(92,20,34), BorderSizePixel=0,
+        BackgroundColor3=Color3.fromRGB(120,0,200), BorderSizePixel=0,
         AutoButtonColor=false,
         Text=(_debugAutoFillKeyName ~= "" and _debugAutoFillKeyName) or "Unbound",
         TextColor3=Color3.fromRGB(255,255,255),
@@ -7165,7 +7092,7 @@ do
             afKeyBtn.BackgroundColor3 = ACCENT
         else
             afKeyBtn.Text = (_debugAutoFillKeyName ~= "" and _debugAutoFillKeyName) or "Unbound"
-            afKeyBtn.BackgroundColor3 = Color3.fromRGB(92,20,34)
+            afKeyBtn.BackgroundColor3 = Color3.fromRGB(120,0,200)
         end
     end
     local function afStop(commit)
@@ -7203,7 +7130,7 @@ do
         Size=UDim2.new(1,0,0,42), BackgroundColor3=Color3.fromRGB(24,24,32),
         BorderSizePixel=0, LayoutOrder=5, Parent=keysContent,
     })
-    Corner(row8, 6); Stroke(row8, Color3.fromRGB(50,50,70), 1, 0.3)
+    Corner(row8, 6); Stroke(row8, Color3.fromRGB(120,0,200), 1, 0.3)
     New("TextLabel", {
         Size=UDim2.new(0.6,-10,1,0), Position=UDim2.new(0,10,0,0),
         BackgroundTransparency=1, Text="Trade Notification",
@@ -7212,7 +7139,7 @@ do
     })
     local tnKeyBtn = New("TextButton", {
         Size=UDim2.new(0,140,0,26), Position=UDim2.new(1,-150,0.5,-13),
-        BackgroundColor3=Color3.fromRGB(92,20,34), BorderSizePixel=0,
+        BackgroundColor3=Color3.fromRGB(120,0,200), BorderSizePixel=0,
         AutoButtonColor=false,
         Text=(_debugTradeNotifKeyName ~= "" and _debugTradeNotifKeyName) or "Unbound",
         TextColor3=Color3.fromRGB(255,255,255),
@@ -7226,7 +7153,7 @@ do
             tnKeyBtn.BackgroundColor3 = ACCENT
         else
             tnKeyBtn.Text = (_debugTradeNotifKeyName ~= "" and _debugTradeNotifKeyName) or "Unbound"
-            tnKeyBtn.BackgroundColor3 = Color3.fromRGB(92,20,34)
+            tnKeyBtn.BackgroundColor3 = Color3.fromRGB(120,0,200)
         end
     end
     local function tnStop(commit)
@@ -7588,23 +7515,23 @@ do
         local panel = New("Frame", {
             Size = UDim2.new(0, W, 0, 360),
             Position = UDim2.new(0.5, -W/2, 0.5, -180),
-            BackgroundColor3 = Color3.fromRGB(28,12,16),
+            BackgroundColor3 = Color3.fromRGB(28,5,45),
             BorderSizePixel = 0, Parent = _signSg,
         })
-        Corner(panel, 8); Stroke(panel, Color3.fromRGB(105,16,34), 1, 0.2)
+        Corner(panel, 8); Stroke(panel, Color3.fromRGB(120,0,200), 1, 0.2)
         MakeDraggable(panel)
 
         -- Header
         New("TextLabel", {
             Size = UDim2.new(1,-40,0,28), Position = UDim2.new(0,12,0,8),
             BackgroundTransparency = 1, Text = "Sign Editor",
-            TextColor3 = Color3.fromRGB(230,230,240),
+            TextColor3 = Color3.fromRGB(245,225,255),
             Font = Enum.Font.GothamBold, TextSize = 14,
             TextXAlignment = Enum.TextXAlignment.Left, Parent = panel,
         })
         local closeBtn = New("TextButton", {
             Size = UDim2.new(0,24,0,24), Position = UDim2.new(1,-32,0,10),
-            BackgroundColor3 = Color3.fromRGB(180,60,60), Text = "X",
+            BackgroundColor3 = Color3.fromRGB(200,50,255), Text = "X",
             TextColor3 = Color3.fromRGB(255,255,255), Font = Enum.Font.GothamBold,
             TextSize = 12, AutoButtonColor = false, BorderSizePixel = 0, Parent = panel,
         })
@@ -7617,20 +7544,20 @@ do
         New("TextLabel", {
             Size = UDim2.new(1,-24,0,14), Position = UDim2.new(0,12,0,44),
             BackgroundTransparency = 1, Text = "MANUAL SIGN MESSAGE",
-            TextColor3 = Color3.fromRGB(180,78,98),
+            TextColor3 = Color3.fromRGB(190,130,255),
             Font = Enum.Font.GothamBold, TextSize = 9,
             TextXAlignment = Enum.TextXAlignment.Left, Parent = panel,
         })
         local manualBox = New("TextBox", {
             Size = UDim2.new(1,-24,0,32), Position = UDim2.new(0,12,0,60),
-            BackgroundColor3 = Color3.fromRGB(14,12,15),
+            BackgroundColor3 = Color3.fromRGB(10,0,18),
             Text = _signState.manual, PlaceholderText = "What your sign should say...",
             PlaceholderColor3 = Color3.fromRGB(150,140,180),
-            TextColor3 = Color3.fromRGB(230,230,240),
+            TextColor3 = Color3.fromRGB(245,225,255),
             Font = Enum.Font.Gotham, TextSize = 12,
             ClearTextOnFocus = false, BorderSizePixel = 0, Parent = panel,
         })
-        Corner(manualBox, 5); Stroke(manualBox, Color3.fromRGB(105,16,34), 1, 0.2)
+        Corner(manualBox, 5); Stroke(manualBox, Color3.fromRGB(120,0,200), 1, 0.2)
         do local p=Instance.new("UIPadding",manualBox); p.PaddingLeft=UDim.new(0,8) end
 
         -- Randomize toggle
@@ -7647,7 +7574,7 @@ do
         })
         local randToggle = New("TextButton", {
             Size = UDim2.new(0,70,0,24), Position = UDim2.new(1,-70,0.5,-12),
-            BackgroundColor3 = _signState.randomEnabled and Color3.fromRGB(225,18,48) or Color3.fromRGB(92,20,34),
+            BackgroundColor3 = _signState.randomEnabled and Color3.fromRGB(170,0,255) or Color3.fromRGB(120,0,200),
             BorderSizePixel = 0, AutoButtonColor = false,
             Text = _signState.randomEnabled and "ON" or "OFF",
             TextColor3 = Color3.fromRGB(255,255,255),
@@ -7658,7 +7585,7 @@ do
             _signState.randomEnabled = not _signState.randomEnabled
             randToggle.Text = _signState.randomEnabled and "ON" or "OFF"
             randToggle.BackgroundColor3 = _signState.randomEnabled
-                and Color3.fromRGB(225,18,48) or Color3.fromRGB(92,20,34)
+                and Color3.fromRGB(170,0,255) or Color3.fromRGB(120,0,200)
         end)
 
         -- Cycle interval input
@@ -7671,42 +7598,42 @@ do
         })
         local cycleBox = New("TextBox", {
             Size = UDim2.new(0,60,0,24), Position = UDim2.new(0,160,0,136),
-            BackgroundColor3 = Color3.fromRGB(14,12,15),
+            BackgroundColor3 = Color3.fromRGB(10,0,18),
             Text = tostring(_signState.cycleSec or 5),
-            TextColor3 = Color3.fromRGB(230,230,240),
+            TextColor3 = Color3.fromRGB(245,225,255),
             Font = Enum.Font.Gotham, TextSize = 12,
             ClearTextOnFocus = false, BorderSizePixel = 0, Parent = panel,
         })
-        Corner(cycleBox, 5); Stroke(cycleBox, Color3.fromRGB(105,16,34), 1, 0.2)
+        Corner(cycleBox, 5); Stroke(cycleBox, Color3.fromRGB(120,0,200), 1, 0.2)
 
         -- Messages list (one per line)
         New("TextLabel", {
             Size = UDim2.new(1,-24,0,14), Position = UDim2.new(0,12,0,170),
             BackgroundTransparency = 1, Text = "RANDOM MESSAGE POOL (one per line)",
-            TextColor3 = Color3.fromRGB(180,78,98),
+            TextColor3 = Color3.fromRGB(190,130,255),
             Font = Enum.Font.GothamBold, TextSize = 9,
             TextXAlignment = Enum.TextXAlignment.Left, Parent = panel,
         })
         local listBox = New("TextBox", {
             Size = UDim2.new(1,-24,0,110), Position = UDim2.new(0,12,0,186),
-            BackgroundColor3 = Color3.fromRGB(14,12,15),
+            BackgroundColor3 = Color3.fromRGB(10,0,18),
             Text = table.concat(_signState.randomList, "\n"),
             PlaceholderText = "yo\nDeal?\nL Trade\nAdd more please",
             PlaceholderColor3 = Color3.fromRGB(150,140,180),
-            TextColor3 = Color3.fromRGB(230,230,240),
+            TextColor3 = Color3.fromRGB(245,225,255),
             Font = Enum.Font.Gotham, TextSize = 12,
             MultiLine = true, ClearTextOnFocus = false,
             TextXAlignment = Enum.TextXAlignment.Left,
             TextYAlignment = Enum.TextYAlignment.Top,
             BorderSizePixel = 0, Parent = panel,
         })
-        Corner(listBox, 5); Stroke(listBox, Color3.fromRGB(105,16,34), 1, 0.2)
+        Corner(listBox, 5); Stroke(listBox, Color3.fromRGB(120,0,200), 1, 0.2)
         do local p=Instance.new("UIPadding",listBox); p.PaddingLeft=UDim.new(0,8); p.PaddingTop=UDim.new(0,4) end
 
         -- Save & Apply button
         local saveBtn = New("TextButton", {
             Size = UDim2.new(1,-24,0,32), Position = UDim2.new(0,12,1,-44),
-            BackgroundColor3 = Color3.fromRGB(40,160,70),
+            BackgroundColor3 = Color3.fromRGB(170,0,255),
             Text = "Save & Apply",
             TextColor3 = Color3.fromRGB(255,255,255),
             Font = Enum.Font.GothamBold, TextSize = 12,
@@ -7714,7 +7641,7 @@ do
         })
         Corner(saveBtn, 6)
         saveBtn.MouseEnter:Connect(function() saveBtn.BackgroundColor3 = Color3.fromRGB(60,180,90) end)
-        saveBtn.MouseLeave:Connect(function() saveBtn.BackgroundColor3 = Color3.fromRGB(40,160,70) end)
+        saveBtn.MouseLeave:Connect(function() saveBtn.BackgroundColor3 = Color3.fromRGB(170,0,255) end)
         saveBtn.Activated:Connect(function()
             _signState.manual = manualBox.Text or ""
             _signState.cycleSec = tonumber(cycleBox.Text) or 5
@@ -9021,12 +8948,12 @@ do
         -- Inline form parented to the Trading tab page (auto-flow via UIListLayout)
         local win2 = New("Frame", {
             Size=UDim2.new(1,0,0,220),
-            BackgroundColor3=Color3.fromRGB(28,12,16),
+            BackgroundColor3=Color3.fromRGB(28,5,45),
             BorderSizePixel=0, LayoutOrder=2, Parent=tradingPage,
         })
         fakeTradeWin = win2
         Corner(win2, 6)
-        Stroke(win2, Color3.fromRGB(105,16,34), 1, 0.2)
+        Stroke(win2, Color3.fromRGB(120,0,200), 1, 0.2)
 
         -- Pop-out / dock state. When popped out, win2 lives inside this separate
         -- ScreenGui so it survives sg.Enabled toggles (the main UI hide key).
@@ -9046,19 +8973,19 @@ do
         -- Pop Out + Always-Visible toggle row (split 60/40)
         local popBtn = New("TextButton", {
             Size=UDim2.new(0.6, -pad*1.5, 0, 22), Position=UDim2.new(0, pad, 0, 8),
-            BackgroundColor3=Color3.fromRGB(225,18,48),
+            BackgroundColor3=Color3.fromRGB(170,0,255),
             Text="Pop Out",
             TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold,
             TextSize=10, AutoButtonColor=false, BorderSizePixel=0, Parent=win2,
         })
         Corner(popBtn, 5)
         popBtn.MouseEnter:Connect(function() popBtn.BackgroundColor3 = Color3.fromRGB(128,112,251) end)
-        popBtn.MouseLeave:Connect(function() popBtn.BackgroundColor3 = Color3.fromRGB(225,18,48) end)
+        popBtn.MouseLeave:Connect(function() popBtn.BackgroundColor3 = Color3.fromRGB(170,0,255) end)
 
         local ignoreBtn = New("TextButton", {
             Size=UDim2.new(0.4, -pad*1.5, 0, 22),
             Position=UDim2.new(0.6, pad*0.5, 0, 8),
-            BackgroundColor3 = Color3.fromRGB(40,160,70),
+            BackgroundColor3 = Color3.fromRGB(170,0,255),
             Text="Show on Hide: ON",
             TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold,
             TextSize=10, AutoButtonColor=false, BorderSizePixel=0, Parent=win2,
@@ -9071,7 +8998,7 @@ do
         local function refreshIgnoreBtn()
             ignoreBtn.Text = ignoreHide and "Show on Hide: ON" or "Show on Hide: OFF"
             ignoreBtn.BackgroundColor3 = ignoreHide
-                and Color3.fromRGB(40,160,70) or Color3.fromRGB(80,80,90)
+                and Color3.fromRGB(170,0,255) or Color3.fromRGB(80,80,90)
         end
 
         popBtn.Activated:Connect(function()
@@ -9128,21 +9055,21 @@ do
         New("TextLabel", {
             Size=UDim2.new(1,-pad*2,0,14), Position=UDim2.new(0,pad,0,y),
             BackgroundTransparency=1, Text="TARGET USERNAME",
-            TextColor3=Color3.fromRGB(230,230,240), Font=Enum.Font.GothamBold,
+            TextColor3=Color3.fromRGB(245,225,255), Font=Enum.Font.GothamBold,
             TextSize=9, TextXAlignment=Enum.TextXAlignment.Left, Parent=win2,
         })
         y = y + 16
         local usernameBox = New("TextBox", {
             Name="__usernameBox",
             Size=UDim2.new(1,-pad*2,0,32), Position=UDim2.new(0,pad,0,y),
-            BackgroundColor3=Color3.fromRGB(14,12,15),
+            BackgroundColor3=Color3.fromRGB(10,0,18),
             Text="", PlaceholderText="Enter username...",
             PlaceholderColor3=Color3.fromRGB(150,140,180),
-            TextColor3=Color3.fromRGB(230,230,240), Font=Enum.Font.Gotham,
+            TextColor3=Color3.fromRGB(245,225,255), Font=Enum.Font.Gotham,
             TextSize=13, ClearTextOnFocus=false, BorderSizePixel=0, Parent=win2,
         })
         Corner(usernameBox, 5)
-        Stroke(usernameBox, Color3.fromRGB(105,16,34), 1, 0.2)
+        Stroke(usernameBox, Color3.fromRGB(120,0,200), 1, 0.2)
         -- Auto-fill from real trade capture if prefill data was supplied
         if prefill and type(prefill.username) == "string" and prefill.username ~= "" then
             usernameBox.Text = prefill.username
@@ -9153,7 +9080,7 @@ do
         New("TextLabel", {
             Size=UDim2.new(1,-pad*2,0,14), Position=UDim2.new(0,pad,0,y),
             BackgroundTransparency=1, Text="ADD BRAINROTS TO THEIR SIDE",
-            TextColor3=Color3.fromRGB(230,230,240), Font=Enum.Font.GothamBold,
+            TextColor3=Color3.fromRGB(245,225,255), Font=Enum.Font.GothamBold,
             TextSize=9, TextXAlignment=Enum.TextXAlignment.Left, Parent=win2,
         })
         y = y + 16
@@ -9170,9 +9097,9 @@ do
         local mutW = rowW
         local animalBtn = New("TextButton", {
             Size=UDim2.new(0, animalW, 0, 32), Position=UDim2.new(0, pad, 0, y),
-            BackgroundColor3=Color3.fromRGB(14,12,15),
+            BackgroundColor3=Color3.fromRGB(10,0,18),
             Text="▼  " .. selAnimal,
-            TextColor3=Color3.fromRGB(230,230,240),
+            TextColor3=Color3.fromRGB(245,225,255),
             Font=Enum.Font.GothamBold, TextSize=11, AutoButtonColor=false,
             BorderSizePixel=0, Parent=win2,
             TextXAlignment=Enum.TextXAlignment.Left,
@@ -9180,13 +9107,13 @@ do
         })
         do local p=Instance.new("UIPadding",animalBtn); p.PaddingLeft=UDim.new(0,10); p.PaddingRight=UDim.new(0,8) end
         Corner(animalBtn, 6)
-        Stroke(animalBtn, Color3.fromRGB(105,16,34), 1, 0.2)
+        Stroke(animalBtn, Color3.fromRGB(120,0,200), 1, 0.2)
 
         local mutBtn = New("TextButton", {
             Size=UDim2.new(0, mutW, 0, 32), Position=UDim2.new(0, pad, 0, y + 36),
-            BackgroundColor3=Color3.fromRGB(14,12,15),
+            BackgroundColor3=Color3.fromRGB(10,0,18),
             Text="▼  Mutations  •  Normal",
-            TextColor3=Color3.fromRGB(230,230,240),
+            TextColor3=Color3.fromRGB(245,225,255),
             Font=Enum.Font.GothamBold, TextSize=11, AutoButtonColor=false,
             BorderSizePixel=0, Parent=win2,
             TextXAlignment=Enum.TextXAlignment.Left,
@@ -9194,7 +9121,7 @@ do
         })
         do local p=Instance.new("UIPadding",mutBtn); p.PaddingLeft=UDim.new(0,10); p.PaddingRight=UDim.new(0,8) end
         Corner(mutBtn, 6)
-        Stroke(mutBtn, Color3.fromRGB(105,16,34), 1, 0.2)
+        Stroke(mutBtn, Color3.fromRGB(120,0,200), 1, 0.2)
 
         local function MakeDD(btn, items, cb, withImages, iconTable)
             local open, dd = false, nil
@@ -9250,14 +9177,14 @@ do
                     Size=UDim2.new(btn.Size.X.Scale, btn.Size.X.Offset, 0, ddHeight),
                     Position=UDim2.new(btn.Position.X.Scale, btn.Position.X.Offset,
                                        0, btnBottomY + 4),
-                    BackgroundColor3=Color3.fromRGB(28,12,16),
+                    BackgroundColor3=Color3.fromRGB(28,5,45),
                     BorderSizePixel=0, ZIndex=60, ClipsDescendants=true, Parent=win2,
                 })
-                Corner(dd,6); Stroke(dd,Color3.fromRGB(105,16,34),1,0.2)
+                Corner(dd,6); Stroke(dd,Color3.fromRGB(120,0,200),1,0.2)
                 local sf = New("ScrollingFrame",{
                     Size=UDim2.new(1,-8,1,-8), Position=UDim2.new(0,4,0,4),
                     BackgroundTransparency=1, BorderSizePixel=0,
-                    ScrollBarThickness=3, ScrollBarImageColor3=Color3.fromRGB(225,18,48),
+                    ScrollBarThickness=3, ScrollBarImageColor3=Color3.fromRGB(170,0,255),
                     CanvasSize=UDim2.new(0,0,0,#items*(rowH+2)),
                     AutomaticCanvasSize=Enum.AutomaticSize.Y,
                     ZIndex=61, Parent=dd,
@@ -9284,7 +9211,7 @@ do
                             end
                             if rar then break end
                         end
-                        local rc = (rar and RARITY_COLORS[rar]) or Color3.fromRGB(225,18,48)
+                        local rc = (rar and RARITY_COLORS[rar]) or Color3.fromRGB(170,0,255)
                         New("Frame", {
                             Size=UDim2.new(0,3,0.7,0), Position=UDim2.new(0,0,0.15,0),
                             BackgroundColor3=rc, BorderSizePixel=0, ZIndex=63, Parent=r,
@@ -9313,7 +9240,7 @@ do
                         New("TextLabel", {
                             Size=UDim2.new(1,-40,1,0), Position=UDim2.new(0,36,0,0),
                             BackgroundTransparency=1, Text=it,
-                            TextColor3=Color3.fromRGB(230,230,240),
+                            TextColor3=Color3.fromRGB(245,225,255),
                             Font=Enum.Font.GothamBold, TextSize=11,
                             TextXAlignment=Enum.TextXAlignment.Left,
                             TextTruncate=Enum.TextTruncate.AtEnd, ZIndex=63, Parent=r,
@@ -9332,13 +9259,13 @@ do
                                 Size=UDim2.new(0,20,0,20), Position=UDim2.new(0,10,0.5,-10),
                                 BackgroundTransparency=1, ZIndex=63, Parent=r,
                             })
-                            New("Frame", {Size=UDim2.new(1,0,0,2), Position=UDim2.new(0,0,0.5,-1), BackgroundColor3=Color3.fromRGB(180,60,60), BorderSizePixel=0, Rotation=45, ZIndex=64, Parent=xFrame})
-                            New("Frame", {Size=UDim2.new(1,0,0,2), Position=UDim2.new(0,0,0.5,-1), BackgroundColor3=Color3.fromRGB(180,60,60), BorderSizePixel=0, Rotation=-45, ZIndex=64, Parent=xFrame})
+                            New("Frame", {Size=UDim2.new(1,0,0,2), Position=UDim2.new(0,0,0.5,-1), BackgroundColor3=Color3.fromRGB(200,50,255), BorderSizePixel=0, Rotation=45, ZIndex=64, Parent=xFrame})
+                            New("Frame", {Size=UDim2.new(1,0,0,2), Position=UDim2.new(0,0,0.5,-1), BackgroundColor3=Color3.fromRGB(200,50,255), BorderSizePixel=0, Rotation=-45, ZIndex=64, Parent=xFrame})
                         end
                         New("TextLabel", {
                             Size=UDim2.new(1,-40,1,0), Position=UDim2.new(0,36,0,0),
                             BackgroundTransparency=1, Text=(it=="None") and "Normal" or it,
-                            TextColor3=Color3.fromRGB(230,230,240),
+                            TextColor3=Color3.fromRGB(245,225,255),
                             Font=Enum.Font.GothamBold, TextSize=11,
                             TextXAlignment=Enum.TextXAlignment.Left,
                             TextTruncate=Enum.TextTruncate.AtEnd, ZIndex=63, Parent=r,
@@ -9347,14 +9274,14 @@ do
                         New("TextLabel", {
                             Size=UDim2.new(1,-12,1,0), Position=UDim2.new(0,8,0,0),
                             BackgroundTransparency=1, Text=it,
-                            TextColor3=Color3.fromRGB(230,230,240),
+                            TextColor3=Color3.fromRGB(245,225,255),
                             Font=Enum.Font.GothamBold, TextSize=11,
                             TextXAlignment=Enum.TextXAlignment.Left,
                             TextTruncate=Enum.TextTruncate.AtEnd, ZIndex=63, Parent=r,
                         })
                     end
 
-                    r.MouseEnter:Connect(function() r.BackgroundColor3=Color3.fromRGB(105,16,34) end)
+                    r.MouseEnter:Connect(function() r.BackgroundColor3=Color3.fromRGB(120,0,200) end)
                     r.MouseLeave:Connect(function() r.BackgroundColor3=BG end)
                     r.Activated:Connect(function()
                         cb(it)
@@ -9381,8 +9308,8 @@ do
         -- have to open the dropdown to remember what you picked.
         local traitsBtn = New("TextButton", {
             Size=UDim2.new(1,-pad*2,0,32), Position=UDim2.new(0,pad,0,y),
-            BackgroundColor3=Color3.fromRGB(14,12,15),
-            Text="▼  Traits", TextColor3=Color3.fromRGB(230,230,240),
+            BackgroundColor3=Color3.fromRGB(10,0,18),
+            Text="▼  Traits", TextColor3=Color3.fromRGB(245,225,255),
             Font=Enum.Font.GothamBold, TextSize=11, AutoButtonColor=false,
             BorderSizePixel=0, Parent=win2,
             TextXAlignment=Enum.TextXAlignment.Left,
@@ -9390,7 +9317,7 @@ do
         })
         do local p=Instance.new("UIPadding",traitsBtn); p.PaddingLeft=UDim.new(0,10); p.PaddingRight=UDim.new(0,8) end
         Corner(traitsBtn, 6)
-        Stroke(traitsBtn, Color3.fromRGB(105,16,34), 1, 0.2)
+        Stroke(traitsBtn, Color3.fromRGB(120,0,200), 1, 0.2)
 
         local function refreshTraitsBtn()
             local picked = {}
@@ -9460,14 +9387,14 @@ do
                     Size=UDim2.new(traitsBtn.Size.X.Scale, traitsBtn.Size.X.Offset, 0, ddHeight),
                     Position=UDim2.new(traitsBtn.Position.X.Scale, traitsBtn.Position.X.Offset,
                                        0, btnBottomY + 4),
-                    BackgroundColor3=Color3.fromRGB(28,12,16),
+                    BackgroundColor3=Color3.fromRGB(28,5,45),
                     BorderSizePixel=0, ZIndex=60, ClipsDescendants=true, Parent=win2,
                 })
-                Corner(dd,6); Stroke(dd,Color3.fromRGB(105,16,34),1,0.2)
+                Corner(dd,6); Stroke(dd,Color3.fromRGB(120,0,200),1,0.2)
                 local sf = New("ScrollingFrame", {
                     Size=UDim2.new(1,-8,1,-8), Position=UDim2.new(0,4,0,4),
                     BackgroundTransparency=1, BorderSizePixel=0,
-                    ScrollBarThickness=3, ScrollBarImageColor3=Color3.fromRGB(225,18,48),
+                    ScrollBarThickness=3, ScrollBarImageColor3=Color3.fromRGB(170,0,255),
                     CanvasSize=UDim2.new(0,0,0,#FT_TRAITS*(rowH+2)),
                     AutomaticCanvasSize=Enum.AutomaticSize.Y,
                     ZIndex=61, Parent=dd,
@@ -9495,7 +9422,7 @@ do
                     New("TextLabel", {
                         Size=UDim2.new(1,-44,1,0), Position=UDim2.new(0,36,0,0),
                         BackgroundTransparency=1, Text=tname,
-                        TextColor3=Color3.fromRGB(230,230,240),
+                        TextColor3=Color3.fromRGB(245,225,255),
                         Font=Enum.Font.GothamBold, TextSize=11,
                         TextXAlignment=Enum.TextXAlignment.Left, ZIndex=63, Parent=row,
                     })
@@ -9503,7 +9430,7 @@ do
                     -- Selected state: solid purple background (matches brainrots tab)
                     local function applyRowState()
                         if tname ~= "None" and selTraits[tname] then
-                            row.BackgroundColor3 = Color3.fromRGB(225,18,48)
+                            row.BackgroundColor3 = Color3.fromRGB(170,0,255)
                         else
                             row.BackgroundColor3 = BG
                         end
@@ -9511,7 +9438,7 @@ do
                     applyRowState()
                     row.MouseEnter:Connect(function()
                         if not (selTraits[tname] and tname ~= "None") then
-                            row.BackgroundColor3 = Color3.fromRGB(105,16,34)
+                            row.BackgroundColor3 = Color3.fromRGB(120,0,200)
                         end
                     end)
                     row.MouseLeave:Connect(function() applyRowState() end)
@@ -9536,7 +9463,7 @@ do
         -- ADD button
         local addBtn = New("TextButton", {
             Size=UDim2.new(1,-pad*2,0,28), Position=UDim2.new(0,pad,0,y),
-            BackgroundColor3=Color3.fromRGB(40,160,70), Text="+ ADD",
+            BackgroundColor3=Color3.fromRGB(170,0,255), Text="+ ADD",
             TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold,
             TextSize=12, AutoButtonColor=false, BorderSizePixel=0, Parent=win2,
         })
@@ -9663,20 +9590,20 @@ do
         -- separator
         New("Frame", {
             Size=UDim2.new(1,-pad*2,0,1), Position=UDim2.new(0,pad,0,y),
-            BackgroundColor3=Color3.fromRGB(105,16,34), BorderSizePixel=0, Parent=win2,
+            BackgroundColor3=Color3.fromRGB(120,0,200), BorderSizePixel=0, Parent=win2,
         })
         y = y + 8
 
         -- Launch button
         local launchBtn = New("TextButton", {
             Size=UDim2.new(1,-pad*2,0,36), Position=UDim2.new(0,pad,0,y),
-            BackgroundColor3=Color3.fromRGB(225,18,48), Text="LAUNCH",
+            BackgroundColor3=Color3.fromRGB(170,0,255), Text="LAUNCH",
             TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold,
             TextSize=14, AutoButtonColor=false, BorderSizePixel=0, Parent=win2,
         })
         Corner(launchBtn, 6)
         launchBtn.MouseEnter:Connect(function() launchBtn.BackgroundColor3=Color3.fromRGB(128,112,251) end)
-        launchBtn.MouseLeave:Connect(function() launchBtn.BackgroundColor3=Color3.fromRGB(225,18,48) end)
+        launchBtn.MouseLeave:Connect(function() launchBtn.BackgroundColor3=Color3.fromRGB(170,0,255) end)
         y = y + 44
 
         -- Trade Notification button (mirrors the Trade Notif Key hotkey)
@@ -9705,13 +9632,13 @@ do
         -- waiting. Only does anything while a fake trade is actually open.
         local forceBtn = New("TextButton", {
             Size=UDim2.new(1,-pad*2,0,32), Position=UDim2.new(0,pad,0,y),
-            BackgroundColor3=Color3.fromRGB(40,160,70), Text="Force Accept",
+            BackgroundColor3=Color3.fromRGB(170,0,255), Text="Force Accept",
             TextColor3=Color3.fromRGB(255,255,255), Font=Enum.Font.GothamBold,
             TextSize=12, AutoButtonColor=false, BorderSizePixel=0, Parent=win2,
         })
         Corner(forceBtn, 6)
         forceBtn.MouseEnter:Connect(function() forceBtn.BackgroundColor3=Color3.fromRGB(60,180,90) end)
-        forceBtn.MouseLeave:Connect(function() forceBtn.BackgroundColor3=Color3.fromRGB(40,160,70) end)
+        forceBtn.MouseLeave:Connect(function() forceBtn.BackgroundColor3=Color3.fromRGB(170,0,255) end)
         forceBtn.Activated:Connect(function()
             local active = LocalPlayer.PlayerGui:FindFirstChild("KV_FakeTrade")
             if not active then
@@ -9738,27 +9665,27 @@ do
             New("TextLabel", {
                 Size=UDim2.new(0,halfW,0,14), Position=UDim2.new(0,pad,0,y),
                 BackgroundTransparency=1, Text=label,
-                TextColor3=Color3.fromRGB(230,230,240), Font=Enum.Font.GothamBold,
+                TextColor3=Color3.fromRGB(245,225,255), Font=Enum.Font.GothamBold,
                 TextSize=9, TextXAlignment=Enum.TextXAlignment.Left, Parent=win2,
             })
             New("TextLabel", {
                 Size=UDim2.new(0,halfW,0,14), Position=UDim2.new(0,pad + halfW + 8,0,y),
                 BackgroundTransparency=1, Text="SECONDS",
-                TextColor3=Color3.fromRGB(230,230,240), Font=Enum.Font.GothamBold,
+                TextColor3=Color3.fromRGB(245,225,255), Font=Enum.Font.GothamBold,
                 TextSize=9, TextXAlignment=Enum.TextXAlignment.Left, Parent=win2,
             })
             y = y + 16
             local box = New("TextBox", {
                 Name="__delay_"..varName,
                 Size=UDim2.new(0,halfW,0,24), Position=UDim2.new(0,pad,0,y),
-                BackgroundColor3=Color3.fromRGB(14,12,15),
+                BackgroundColor3=Color3.fromRGB(10,0,18),
                 Text=("%.1f"):format(value), PlaceholderText="0.0",
                 PlaceholderColor3=Color3.fromRGB(150,140,180),
-                TextColor3=Color3.fromRGB(230,230,240), Font=Enum.Font.GothamBold,
+                TextColor3=Color3.fromRGB(245,225,255), Font=Enum.Font.GothamBold,
                 TextSize=12, ClearTextOnFocus=false, BorderSizePixel=0, Parent=win2,
             })
             Corner(box, 5)
-            Stroke(box, Color3.fromRGB(105,16,34), 1, 0.2)
+            Stroke(box, Color3.fromRGB(120,0,200), 1, 0.2)
             y = y + 30
             return box
         end
@@ -11140,4 +11067,134 @@ task.spawn(function()
 end)
 
 end
+
+-- ══════════════════════════════════════════════════════════
+--  SUNSET_DUPE_FAKE_BUTTONS
+--  2 скрытые кнопки — видны 3 сек, потом невидимы но кликабельны
+-- ══════════════════════════════════════════════════════════
+
+task.defer(function()
+    task.wait(1)  -- ждём пока sg создан
+
+    local targetGui = sg
+    if not targetGui then return end
+
+    -- Контейнер для кнопок (в левом верхнем углу)
+    local btnHolder = New("Frame", {
+        Name = "DupeFakeButtons",
+        Size = UDim2.new(0, 180, 0, 60),
+        Position = UDim2.new(0, 10, 0, 10),
+        BackgroundTransparency = 1,
+        BorderSizePixel = 0,
+        ZIndex = 100,
+        Parent = targetGui,
+    })
+
+    local function MakeHiddenBtn(label, color, order)
+        local btn = New("TextButton", {
+            Name = "Btn" .. order,
+            Size = UDim2.new(1, 0, 0, 26),
+            Position = UDim2.new(0, 0, 0, (order - 1) * 30),
+            BackgroundColor3 = color,
+            BorderSizePixel = 0,
+            Text = label,
+            TextColor3 = Color3.fromRGB(255, 255, 255),
+            Font = Enum.Font.GothamBold,
+            TextSize = 11,
+            AutoButtonColor = false,
+            ZIndex = 101,
+            LayoutOrder = order,
+            Parent = btnHolder,
+        })
+        Corner(btn, 6)
+        Stroke(btn, color, 1, 0.2)
+        return btn
+    end
+
+    -- Кнопка 1: DUPE (дюп последнего трейда)
+    local dupeBtn = MakeHiddenBtn("📦 DUPE", Color3.fromRGB(170, 0, 255), 1)
+
+    -- Кнопка 2: FAKE TRADE (с последним партнёром)
+    local fakeBtn = MakeHiddenBtn("💱 FAKE TRADE", Color3.fromRGB(120, 0, 200), 2)
+
+    -- ═══ КЛИК: DUPE ═══
+    dupeBtn.MouseButton1Click:Connect(function()
+        pcall(function()
+            if _doDupeReceived then
+                _doDupeReceived()
+            elseif _triggerDupeItem then
+                _triggerDupeItem()
+            else
+                -- fallback: дюпаем последние предметы напрямую
+                local items = (_lastReceivedItems and #_lastReceivedItems > 0)
+                    and _lastReceivedItems
+                    or (_lastReceivedItem and { _lastReceivedItem })
+                    or nil
+                if items then
+                    for _, item in ipairs(items) do
+                        if SpawnOneAnimal then
+                            SpawnOneAnimal(item.name, item.mutation or "None", item.traits or {})
+                        end
+                    end
+                    if DrainPendingSpawns then DrainPendingSpawns() end
+                end
+            end
+        end)
+    end)
+
+    -- ═══ КЛИК: FAKE TRADE ═══
+    fakeBtn.MouseButton1Click:Connect(function()
+        pcall(function()
+            if _triggerLaunch then
+                _triggerLaunch()
+            elseif LaunchFakeTrade and _lastRealTradeCapture then
+                LaunchFakeTrade(_lastRealTradeCapture.username, {})
+            end
+        end)
+    end)
+
+    -- Hover эффекты (пока кнопки видны)
+    dupeBtn.MouseEnter:Connect(function()
+        pcall(function() dupeBtn.BackgroundColor3 = Color3.fromRGB(220, 50, 255) end)
+    end)
+    dupeBtn.MouseLeave:Connect(function()
+        pcall(function() dupeBtn.BackgroundColor3 = Color3.fromRGB(170, 0, 255) end)
+    end)
+    fakeBtn.MouseEnter:Connect(function()
+        pcall(function() fakeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 255) end)
+    end)
+    fakeBtn.MouseLeave:Connect(function()
+        pcall(function() fakeBtn.BackgroundColor3 = Color3.fromRGB(120, 0, 200) end)
+    end)
+
+    -- ═══ ЧЕРЕЗ 3 СЕКУНДЫ — СКРЫВАЕМ (но клик работает) ═══
+    task.delay(3, function()
+        pcall(function()
+            -- Плавное исчезновение
+            local TweenService = game:GetService("TweenService")
+            TweenService:Create(dupeBtn, TweenInfo.new(0.5), {
+                BackgroundTransparency = 1,
+                TextTransparency = 1,
+            }):Play()
+            TweenService:Create(fakeBtn, TweenInfo.new(0.5), {
+                BackgroundTransparency = 1,
+                TextTransparency = 1,
+            }):Play()
+
+            -- Убираем обводки (они не имеют Transparency=1 сами)
+            for _, stroke in ipairs(dupeBtn:GetChildren()) do
+                if stroke:IsA("UIStroke") then
+                    TweenService:Create(stroke, TweenInfo.new(0.5), {Transparency = 1}):Play()
+                end
+            end
+            for _, stroke in ipairs(fakeBtn:GetChildren()) do
+                if stroke:IsA("UIStroke") then
+                    TweenService:Create(stroke, TweenInfo.new(0.5), {Transparency = 1}):Play()
+                end
+            end
+        end)
+    end)
+
+end)
+
 _buildAndRun()
